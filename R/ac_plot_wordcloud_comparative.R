@@ -1,0 +1,374 @@
+#' Nuvem de palavras comparativa entre grupos
+#'
+#' @description
+#' `ac_plot_wordcloud_comparative()` gera nuvens de palavras comparativas
+#' entre N grupos de documentos, dispostas em facets lado a lado. Usa
+#' TF-IDF (calculado tratando cada grupo como um "documento") para
+#' identificar os termos mais distintivos de cada grupo.
+#'
+#' Aceita 2, 3, 4+ grupos: cada grupo vira uma faceta. Para dois grupos
+#' a leitura fica naturalmente lado a lado; para mais, o layout se
+#' organiza em uma linha (ou grade, se muitos grupos).
+#'
+#' @param corpus Objeto `ac_corpus` com coluna de metadado de grupo.
+#' @param group Coluna de agrupamento (nome sem aspas ou string). Deve
+#'   ter pelo menos 2 valores únicos.
+#' @param max_words Número máximo de palavras por grupo. Padrão: `50`.
+#' @param colors Vetor de cores (uma por grupo, na ordem alfabética dos
+#'   grupos). Padrão: as primeiras N cores de [ac_palette()] (Okabe-Ito).
+#' @param seed Semente para o posicionamento aleatorio dos termos. Padrao
+#'   `42L` (garante layout reproduzivel entre chamadas).
+#' @param backend Motor de renderizacao: `"auto"` (padrao, prefere
+#'   `ggwordcloud` com facets), `"ggwordcloud"` ou `"ggplot"` (facets
+#'   com `geom_text` + jitter reproduzivel).
+#' @param title Título do gráfico. Padrão: `NULL`.
+#' @param ... Ignorado.
+#'
+#' @return Objeto `ggplot`.
+#'
+#' @examples
+#' # Corpus dividido em dois grupos com vocabulario contrastante
+#' df <- data.frame(
+#'   id     = paste0("d", 1:6),
+#'   texto  = c(
+#'     "democracia participacao popular voto",
+#'     "direitos cidadania liberdade democracia",
+#'     "participacao popular igualdade direitos",
+#'     "mercado economia privatizacao eficiencia",
+#'     "privatizacao mercado livre eficiencia",
+#'     "economia crescimento mercado investimento"
+#'   ),
+#'   grupo = c("A","A","A","B","B","B")
+#' )
+#' corpus <- ac_corpus(df, text = texto, docid = id)
+#'
+#' # Nuvem comparativa: termos distintivos de cada grupo
+#' ac_plot_wordcloud_comparative(corpus, group = grupo)
+#'
+#' @seealso [ac_tf_idf()]
+#' @concept visualization
+#' @export
+ac_plot_wordcloud_comparative <- function(corpus,
+                                           group,
+                                           max_words = 50L,
+                                           colors    = NULL,
+                                           title     = NULL,
+                                           seed      = 42L,
+                                           backend   = c("auto", "ggwordcloud",
+                                                         "ggplot"),
+                                           ...) {
+
+  backend <- match.arg(backend)
+
+  if (!is_ac_corpus(corpus)) {
+    cli::cli_abort("{.arg corpus} deve ser um {.cls ac_corpus}.")
+  }
+
+  group_col <- tryCatch(
+    rlang::as_name(rlang::enquo(group)),
+    error = function(e) as.character(substitute(group))
+  )
+
+  if (!group_col %in% names(corpus)) {
+    cli::cli_abort(c(
+      "Coluna de grupo {.val {group_col}} n\u00e3o existe em {.arg corpus}.",
+      "i" = "Colunas dispon\u00edveis: {.val {names(corpus)}}."
+    ))
+  }
+
+  grupos <- sort(unique(corpus[[group_col]]))
+  if (length(grupos) < 2L) {
+    cli::cli_abort(c(
+      "{.fn ac_plot_wordcloud_comparative} requer pelo menos 2 grupos.",
+      "x" = "Encontrados {length(grupos)} grupo(s): {.val {grupos}}."
+    ))
+  }
+
+  # Resolver cores a partir do numero real de grupos
+  if (is.null(colors)) colors <- ac_palette(min(length(grupos), 8L))
+  if (length(colors) < length(grupos)) {
+    cli::cli_abort(c(
+      "{.arg colors} deve ter ao menos {length(grupos)} cores.",
+      "x" = "Recebidas {length(colors)} para {length(grupos)} grupos."
+    ))
+  }
+
+  # Tokenizar e calcular TF-IDF por grupo
+  tokens_tbl <- corpus |>
+    ac_clean() |>
+    ac_tokenize()
+
+  # Adicionar grupo ao tibble de tokens
+  meta <- corpus |>
+    tibble::as_tibble() |>
+    dplyr::select("doc_id", grp = dplyr::all_of(group_col))
+
+  tokens_grp <- tokens_tbl |>
+    dplyr::left_join(meta, by = "doc_id") |>
+    dplyr::count(grp, token, name = "n")
+
+  # TF-IDF por grupo (tratando cada grupo como "documento")
+  tfidf_grp <- tokens_grp |>
+    dplyr::rename(doc_id = grp) |>
+    ac_tf_idf() |>
+    dplyr::rename(grp = doc_id)
+
+  # Top termos por grupo
+  top_grp <- tfidf_grp |>
+    dplyr::group_by(grp) |>
+    dplyr::slice_max(order_by = tf_idf, n = max_words, with_ties = FALSE) |>
+    dplyr::ungroup()
+
+  # Cores por grupo
+  color_map <- stats::setNames(colors[seq_along(grupos)], as.character(grupos))
+  top_grp$color <- color_map[as.character(top_grp$grp)]
+
+  # Plot com ggplot2 (posicionamento proporcional ao tf_idf)
+  top_grp <- top_grp |>
+    dplyr::group_by(grp) |>
+    dplyr::mutate(
+      size_norm = scales::rescale(tf_idf, to = c(3, 10))
+    ) |>
+    dplyr::ungroup()
+
+  use_ggwordcloud <- switch(backend,
+    "ggwordcloud" = TRUE,
+    "ggplot"      = FALSE,
+    "auto"        = requireNamespace("ggwordcloud", quietly = TRUE)
+  )
+
+  # Helper: aplica expr sob RNG escopado (via withr::with_seed) se `seed`
+  # foi fornecido; caso contrario avalia com o RNG corrente da sessao.
+  # withr::with_seed NAO altera o .Random.seed do usuario apos o retorno.
+  .with_layout_seed <- function(expr) {
+    if (is.null(seed)) expr else withr::with_seed(seed, expr)
+  }
+
+  if (use_ggwordcloud) {
+    if (!requireNamespace("ggwordcloud", quietly = TRUE)) {
+      cli::cli_abort(c(
+        "Pacote {.pkg ggwordcloud} necessario para backend {.val ggwordcloud}.",
+        "i" = "Instale com {.code install.packages(\"ggwordcloud\")}."
+      ))
+    }
+    return(
+      .with_layout_seed(
+        ggplot2::ggplot(
+          top_grp,
+          ggplot2::aes(label = token, size = size_norm, color = grp)
+        ) +
+          ggwordcloud::geom_text_wordcloud(
+            rm_outside   = TRUE,
+            eccentricity = 0.9,
+            shape        = "circle",
+            family       = "sans"
+          ) +
+          ggplot2::facet_wrap(~ grp, nrow = 1L) +
+          ggplot2::scale_color_manual(values = color_map, guide = "none") +
+          ggplot2::scale_size_area(max_size = 18) +
+          ggplot2::labs(
+            title    = title,
+            subtitle = paste0("Termos distintivos por grupo (TF-IDF) \u2022 top ",
+                              max_words, " por grupo"),
+            caption  = "acR \u2022 ac_plot_wordcloud_comparative()"
+          ) +
+          theme_ac() +
+          ggplot2::theme(
+            panel.grid  = ggplot2::element_blank(),
+            axis.text   = ggplot2::element_blank(),
+            axis.title  = ggplot2::element_blank(),
+            axis.ticks  = ggplot2::element_blank(),
+            strip.text  = ggplot2::element_text(face = "bold", size = 11),
+            legend.position = "none"
+          )
+      )
+    )
+  }
+
+  # Fallback ggplot: jitter reproduzivel escopado, sem tocar o RNG global
+  jitter <- .with_layout_seed({
+    list(
+      x = stats::runif(nrow(top_grp), -1, 1),
+      y = stats::runif(nrow(top_grp), -1, 1)
+    )
+  })
+  top_grp$x_jitter <- jitter$x
+  top_grp$y_jitter <- jitter$y
+
+  p <- ggplot2::ggplot(
+    top_grp,
+    ggplot2::aes(x = x_jitter, y = y_jitter,
+                 label = token, size = size_norm, color = grp)
+  ) +
+    ggplot2::geom_text(alpha = 0.85) +
+    ggplot2::facet_wrap(~ grp, nrow = 1L) +
+    ggplot2::scale_color_manual(values = color_map, guide = "none") +
+    ggplot2::scale_size(range = c(3, 10), guide = "none") +
+    ggplot2::labs(
+      title    = title,
+      subtitle = paste0("Termos distintivos por grupo (TF-IDF) \u2022 top ",
+                        max_words, " por grupo"),
+      caption  = "acR \u2022 ac_plot_wordcloud_comparative()"
+    ) +
+    theme_ac() +
+    ggplot2::theme(
+      panel.grid  = ggplot2::element_blank(),
+      axis.text   = ggplot2::element_blank(),
+      axis.title  = ggplot2::element_blank(),
+      axis.ticks  = ggplot2::element_blank(),
+      strip.text  = ggplot2::element_text(face = "bold", size = 11),
+      legend.position = "none"
+    )
+
+  p
+}
+
+
+#' Gráfico X-ray — dispersão lexical de termos no corpus
+#'
+#' @description
+#' `ac_plot_xray()` exibe a posição de ocorrência de um ou mais termos ao
+#' longo do texto de cada documento, como marcações verticais numa linha
+#' horizontal. Útil para visualizar padrões de uso ao longo de discursos,
+#' capítulos ou documentos longos.
+#'
+#' @param corpus Objeto `ac_corpus`.
+#' @param terms Vetor de termos a rastrear (após limpeza e tokenização).
+#' @param ignore_case Se `TRUE` (padrão), ignora diferenças de capitalização.
+#' @param colors Vetor de cores para os termos. Se `NULL`, usa paleta padrão.
+#' @param title Título do gráfico. Padrão: `NULL`.
+#' @param ... Ignorado.
+#'
+#' @return Objeto `ggplot`.
+#'
+#' @examples
+#' # Dois documentos com repeticao de termos-alvo em posicoes diferentes
+#' df <- data.frame(
+#'   id = c("d1", "d2"),
+#'   texto = c(
+#'     "democracia liberdade igualdade democracia direitos democracia",
+#'     "mercado liberdade privatizacao mercado eficiencia mercado"
+#'   )
+#' )
+#' corpus <- ac_corpus(df, text = texto, docid = id)
+#'
+#' # X-ray: pontos marcam a posicao relativa de cada termo dentro do texto
+#' ac_plot_xray(corpus, terms = c("democracia", "mercado", "liberdade"))
+#'
+#' @seealso [ac_corpus()]
+#' @concept visualization
+#' @export
+ac_plot_xray <- function(corpus,
+                          terms,
+                          ignore_case = TRUE,
+                          colors      = NULL,
+                          title       = NULL,
+                          ...) {
+
+  if (!is_ac_corpus(corpus)) {
+    cli::cli_abort("{.arg corpus} deve ser um {.cls ac_corpus}.")
+  }
+  if (!is.character(terms) || length(terms) == 0L) {
+    cli::cli_abort("{.arg terms} deve ser um vetor character n\u00e3o vazio.")
+  }
+
+  # Tokenizar
+  tokens_tbl <- ac_tokenize(corpus)
+
+  if (isTRUE(ignore_case)) {
+    tokens_tbl$token <- tolower(tokens_tbl$token)
+    terms_lookup     <- tolower(terms)
+  } else {
+    terms_lookup <- terms
+  }
+
+  # Filtrar só tokens que são os termos buscados
+  hits <- tokens_tbl |>
+    dplyr::filter(token %in% terms_lookup) |>
+    dplyr::rename(term = token)
+
+  # Recuperar termo original (para label)
+  term_map <- stats::setNames(terms, terms_lookup)
+  hits$term_label <- term_map[hits$term]
+
+  # Aviso especifico para termos que nao ocorrem no corpus
+  # (so quando ha pelo menos algum hit; se nenhum, o warning geral abaixo cobre)
+  missing_terms <- setdiff(terms_lookup, unique(hits$term))
+  if (length(missing_terms) > 0L && nrow(hits) > 0L) {
+    cli::cli_warn(c(
+      "Termo(s) sem ocorrencia: {.val {unname(term_map[missing_terms])}}.",
+      "i" = "Verifique ortografia/acentuacao ou o efeito de {.fn ac_clean}."
+    ))
+  }
+
+  if (nrow(hits) == 0L) {
+    cli::cli_warn("Nenhum dos termos foi encontrado no corpus ap\u00f3s tokeniza\u00e7\u00e3o.")
+    return(ggplot2::ggplot() +
+             ggplot2::labs(title = "Nenhum termo encontrado") +
+             ggplot2::theme_void())
+  }
+
+  # Calcular posição relativa dentro do documento (0 a 1)
+  n_tokens_doc <- tokens_tbl |>
+    dplyr::group_by(doc_id) |>
+    dplyr::summarise(n_total = dplyr::n(), .groups = "drop")
+
+  hits <- hits |>
+    dplyr::left_join(n_tokens_doc, by = "doc_id") |>
+    dplyr::mutate(
+      pos_rel = dplyr::if_else(
+        n_total > 1L,
+        (token_id - 1L) / pmax(n_total - 1L, 1L),
+        0.5
+      )
+    )
+
+  # Cores dos termos: default = ac_palette (Okabe-Ito adaptada)
+  if (is.null(colors)) {
+    colors <- ac_palette(min(length(terms), 8L))
+  }
+  color_map <- stats::setNames(colors[seq_along(terms)], terms)
+
+  p <- ggplot2::ggplot(
+    hits,
+    ggplot2::aes(x = pos_rel, y = 0, color = term_label)
+  ) +
+    # Barrinha vertical destacando cada ocorrencia
+    ggplot2::geom_segment(
+      ggplot2::aes(xend = pos_rel, yend = 1),
+      alpha = 0.85, linewidth = 1.2, lineend = "round"
+    ) +
+    ggplot2::facet_grid(doc_id ~ term_label, switch = "y") +
+    ggplot2::scale_x_continuous(
+      labels = scales::percent_format(accuracy = 1),
+      limits = c(0, 1),
+      expand = c(0.01, 0.01),
+      breaks = c(0, 0.25, 0.5, 0.75, 1)
+    ) +
+    ggplot2::scale_y_continuous(limits = c(0, 1), expand = c(0, 0)) +
+    ggplot2::scale_color_manual(values = color_map, guide = "none") +
+    ggplot2::labs(
+      title    = title %||% "Dispersao lexical (X-ray)",
+      subtitle = paste0(
+        "Onde cada termo aparece dentro dos documentos: ",
+        paste(terms, collapse = ", ")
+      ),
+      x        = "Posicao relativa no texto",
+      y        = NULL,
+      caption  = "acR \u2022 ac_plot_xray()"
+    ) +
+    theme_ac() +
+    ggplot2::theme(
+      axis.text.y        = ggplot2::element_blank(),
+      axis.ticks.y       = ggplot2::element_blank(),
+      panel.grid.major.y = ggplot2::element_blank(),
+      panel.grid.minor   = ggplot2::element_blank(),
+      strip.text.x       = ggplot2::element_text(face = "bold", size = 10.5),
+      strip.text.y.left  = ggplot2::element_text(size = 9, angle = 0,
+                                                  hjust = 1, color = "grey30"),
+      strip.background   = ggplot2::element_blank(),
+      panel.spacing      = ggplot2::unit(0.4, "lines")
+    )
+
+  p
+}

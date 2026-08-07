@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Análise de proposições legislativas</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Análise de proposições legislativas</h1>
+
+
+
+<div id="contexto" class="section level2">
+<h2>Contexto</h2>
+<p>Esta vignette demonstra o pipeline completo do <code>acR</code>
+aplicado à classificação do posicionamento de textos legislativos. O
+corpus cobre três proposições de alta saliência na 57ª legislatura
+brasileira: a jornada 6x1 (PLP 300/2023), a anistia dos atos de 8 de
+Janeiro (PL 2858/2022) e a Reforma Administrativa (PEC 32/2020).</p>
+<p>O objetivo é classificar cada texto em uma categoria de
+posicionamento (Favorável, Contrário, Neutro/Técnico, Populista ou
+Ambíguo), calcular o grau de certeza via <em>self-consistency</em> e
+validar os resultados com revisão humana.</p>
+<hr />
+</div>
+<div id="instalar-e-configurar" class="section level2">
+<h2>1. Instalar e configurar</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;andersonheri/acR&quot;</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ellmer&quot;</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a><span class="co"># Configurar chave de API no .Renviron</span></span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>usethis<span class="sc">::</span><span class="fu">edit_r_environ</span>()</span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co"># Adicione: GROQ_API_KEY=sua_chave</span></span></code></pre></div>
+<hr />
+</div>
+<div id="corpus" class="section level2">
+<h2>2. Corpus</h2>
+<p>O corpus é criado a partir de um <code>data.frame</code> com os
+textos e metadados. Cada proposição tem três documentos: a ementa
+técnica, um discurso favorável e um discurso contrário.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="fu">library</span>(acR)</span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>textos <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  <span class="st">&quot;Altera a CLT para instituir a escala 4x3, vedando a jornada 6x1.&quot;</span>,</span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="st">&quot;Conquista histórica: votaremos favoráveis com convicção.&quot;</span>,</span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>  <span class="st">&quot;Gerará desemprego em massa nas micro e pequenas empresas.&quot;</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>  <span class="st">&quot;Concede anistia aos condenados pelos atos de 8 de janeiro de 2023.&quot;</span>,</span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>  <span class="st">&quot;Presos políticos: votar pela anistia é votar pela democracia.&quot;</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>  <span class="st">&quot;Anistiar quem atacou o Congresso é uma afronta à democracia.&quot;</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>  <span class="st">&quot;Modifica a CF/88, extinguindo a estabilidade para novos servidores.&quot;</span>,</span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a>  <span class="st">&quot;Modernização necessária para aumentar eficiência e reduzir custos.&quot;</span>,</span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>  <span class="st">&quot;Ataca direitos conquistados e abre espaço para perseguição política.&quot;</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>)</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>  <span class="at">id    =</span> <span class="fu">c</span>(<span class="st">&quot;plp300_ementa&quot;</span>,  <span class="st">&quot;plp300_favor&quot;</span>,  <span class="st">&quot;plp300_contra&quot;</span>,</span>
+<span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>            <span class="st">&quot;pl2858_ementa&quot;</span>,  <span class="st">&quot;pl2858_favor&quot;</span>,  <span class="st">&quot;pl2858_contra&quot;</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>            <span class="st">&quot;pec32_ementa&quot;</span>,   <span class="st">&quot;pec32_favor&quot;</span>,   <span class="st">&quot;pec32_contra&quot;</span>),</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>  <span class="at">texto =</span> textos,</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>  <span class="at">tema  =</span> <span class="fu">c</span>(<span class="st">&quot;6x1&quot;</span>,     <span class="st">&quot;6x1&quot;</span>,     <span class="st">&quot;6x1&quot;</span>,</span>
+<span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>            <span class="st">&quot;anistia&quot;</span>, <span class="st">&quot;anistia&quot;</span>, <span class="st">&quot;anistia&quot;</span>,</span>
+<span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>            <span class="st">&quot;reform&quot;</span>,  <span class="st">&quot;reform&quot;</span>,  <span class="st">&quot;reform&quot;</span>),</span>
+<span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  <span class="at">tipo  =</span> <span class="fu">c</span>(<span class="st">&quot;ementa&quot;</span>,   <span class="st">&quot;favoravel&quot;</span>, <span class="st">&quot;contrario&quot;</span>,</span>
+<span id="cb2-26"><a href="#cb2-26" tabindex="-1"></a>            <span class="st">&quot;ementa&quot;</span>,   <span class="st">&quot;favoravel&quot;</span>, <span class="st">&quot;contrario&quot;</span>,</span>
+<span id="cb2-27"><a href="#cb2-27" tabindex="-1"></a>            <span class="st">&quot;ementa&quot;</span>,   <span class="st">&quot;favoravel&quot;</span>, <span class="st">&quot;contrario&quot;</span>),</span>
+<span id="cb2-28"><a href="#cb2-28" tabindex="-1"></a>  <span class="at">stringsAsFactors =</span> <span class="cn">FALSE</span></span>
+<span id="cb2-29"><a href="#cb2-29" tabindex="-1"></a>)</span>
+<span id="cb2-30"><a href="#cb2-30" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">ac_corpus</span>(df, <span class="at">text =</span> texto, <span class="at">docid =</span> id)</span>
+<span id="cb2-32"><a href="#cb2-32" tabindex="-1"></a><span class="fu">print</span>(corpus)</span></code></pre></div>
+<pre><code>## -- Corpus acR --
+## * Documentos: 9
+## * Metadados: 2 colunas (tema, tipo)
+## * Idioma: &quot;pt&quot;</code></pre>
+<hr />
+</div>
+<div id="codebook" class="section level2">
+<h2>3. Codebook</h2>
+<p>O codebook define as cinco categorias de posicionamento com suas
+definições operacionais. A instrução orienta o modelo a usar
+<code>Populista</code> para textos com apelo emocional sem argumentação
+substantiva — uma distinção importante para a análise de discursos
+parlamentares brasileiros.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>codebook <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;posicionamento_proposicoes&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="fu">paste</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="st">&quot;Classifique o posicionamento do texto em relação à proposição.&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    <span class="st">&quot;Use Populista para apelo emocional sem argumentação substantiva.&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>  ),</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  <span class="at">categories =</span> <span class="fu">list</span>(</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>    <span class="at">favoravel      =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;Apoio explícito à proposição com argumentação substantiva.&quot;</span>),</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a>    <span class="at">contrario      =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;Oposição à proposição com argumentação substantiva.&quot;</span>),</span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a>    <span class="at">neutro_tecnico =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;Descrição jurídica ou técnica sem valoração explícita.&quot;</span>),</span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>    <span class="at">populista      =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;Apelo emocional sem evidência ou argumentação técnica.&quot;</span>),</span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a>    <span class="at">ambiguo        =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;Posicionamento contraditório ou impossível de classificar.&quot;</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a>  ),</span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">&quot;manual&quot;</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a>)</span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="fu">print</span>(codebook)</span></code></pre></div>
+<pre><code>## -- Codebook acR: &quot;posicionamento_proposicoes&quot; --
+## * Modo: &quot;manual&quot;
+## * Categorias (5): &quot;favoravel&quot;, &quot;contrario&quot;, &quot;neutro_tecnico&quot;,
+##   &quot;populista&quot; and &quot;ambiguo&quot;
+## * Multilabel: FALSE
+## * Idioma: &quot;pt&quot;</code></pre>
+<hr />
+</div>
+<div id="b.-refinamento-do-codebook" class="section level2">
+<h2>3b. Refinamento do codebook</h2>
+<p>O <code>acR</code> oferece um conjunto de funções para refinar o
+codebook iterativamente antes de iniciar a classificação. Este passo é
+opcional mas recomendado para análises com categorias complexas ou
+sobrepostas.</p>
+<div id="adicionar-exemplos-às-categorias" class="section level3">
+<h3>Adicionar exemplos às categorias</h3>
+<p>Exemplos positivos e negativos melhoram a precisão da classificação,
+especialmente em categorias limítrofes como <code>populista</code> e
+<code>ambiguo</code> (Sampaio &amp; Lycarião, 2021):</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="co"># Recriar com exemplos explícitos para as categorias mais difíceis</span></span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>codebook <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook</span>(</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;posicionamento_proposicoes&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="fu">paste</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="st">&quot;Classifique o posicionamento do texto em relação à proposição.&quot;</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="st">&quot;Use Populista para apelo emocional sem argumentação substantiva.&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>  ),</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  <span class="at">categories =</span> <span class="fu">list</span>(</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>    <span class="at">favoravel =</span> <span class="fu">list</span>(</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Apoio explícito à proposição com argumentação substantiva.&quot;</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Esta reforma aumentará a produtividade e reduzirá custos.&quot;</span>),</span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>      <span class="at">examples_neg =</span> <span class="fu">c</span>(<span class="st">&quot;Votaremos com o coração pela causa do povo.&quot;</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>    ),</span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>    <span class="at">contrario =</span> <span class="fu">list</span>(</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Oposição à proposição com argumentação substantiva.&quot;</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Os dados mostram que esta medida aumentará o desemprego.&quot;</span>),</span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>      <span class="at">examples_neg =</span> <span class="fu">c</span>(<span class="st">&quot;Esta proposta é uma vergonha nacional.&quot;</span>)</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>    ),</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>    <span class="at">neutro_tecnico =</span> <span class="fu">list</span>(</span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Descrição jurídica ou técnica sem valoração explícita.&quot;</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Altera o art. 58 da CLT, estabelecendo nova escala.&quot;</span>),</span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>      <span class="at">examples_neg =</span> <span class="fu">c</span>(<span class="st">&quot;Apoiamos esta proposta de modernização.&quot;</span>)</span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a>    ),</span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a>    <span class="at">populista =</span> <span class="fu">list</span>(</span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Apelo emocional sem evidência ou argumentação técnica.&quot;</span>,</span>
+<span id="cb6-26"><a href="#cb6-26" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Presos políticos: este é o momento da justiça!&quot;</span>),</span>
+<span id="cb6-27"><a href="#cb6-27" tabindex="-1"></a>      <span class="at">examples_neg =</span> <span class="fu">c</span>(<span class="st">&quot;Estudos mostram que a medida reduz 15% dos custos.&quot;</span>),</span>
+<span id="cb6-28"><a href="#cb6-28" tabindex="-1"></a>      <span class="at">weight       =</span> <span class="fl">1.5</span>  <span class="co"># categoria mais difícil: peso maior</span></span>
+<span id="cb6-29"><a href="#cb6-29" tabindex="-1"></a>    ),</span>
+<span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a>    <span class="at">ambiguo =</span> <span class="fu">list</span>(</span>
+<span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Posicionamento contraditório ou impossível de classificar.&quot;</span>,</span>
+<span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Apoio a reforma mas temo suas consequências sociais.&quot;</span>),</span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a>      <span class="at">weight       =</span> <span class="fl">1.2</span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a>    )</span>
+<span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a>  ),</span>
+<span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a>  <span class="at">mode =</span> <span class="st">&quot;manual&quot;</span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="enriquecer-com-literatura-via-llm" class="section level3">
+<h3>Enriquecer com literatura via LLM</h3>
+<p><code>ac_qual_codebook_hybrid()</code> re-ancora as definições em
+referências bibliográficas buscadas via LLM, preservando os exemplos
+manuais:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>chat_obj <span class="ot">&lt;-</span> <span class="fu">chat_groq</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">&quot;llama-3.3-70b-versatile&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">echo  =</span> <span class="st">&quot;none&quot;</span></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>codebook_enriquecido <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook_hybrid</span>(</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>  <span class="at">codebook =</span> codebook,</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  <span class="at">chat     =</span> chat_obj,</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>  <span class="at">n_refs   =</span> <span class="dv">2</span><span class="dt">L</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>  <span class="at">lang     =</span> <span class="st">&quot;pt&quot;</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>)</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co"># Ver definição enriquecida da categoria populista</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="fu">cat</span>(codebook_enriquecido<span class="sc">$</span>categories<span class="sc">$</span>populista<span class="sc">$</span>definition)</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Referências:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="fu">print</span>(codebook_enriquecido<span class="sc">$</span>categories<span class="sc">$</span>populista<span class="sc">$</span>references)</span></code></pre></div>
+</div>
+<div id="fundir-com-codebook-de-estilo-retórico" class="section level3">
+<h3>Fundir com codebook de estilo retórico</h3>
+<p>Para análises multidimensionais, é possível fundir dois codebooks.
+Aqui adicionamos uma dimensão de estilo retórico ao codebook de
+posicionamento:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>codebook_retorico <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;estilo_retorico&quot;</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">&quot;Identifique o estilo retórico dominante.&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">categories   =</span> <span class="fu">list</span>(</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>    <span class="at">pathos =</span> <span class="fu">list</span>(</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Apelo emocional predominante.&quot;</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Não podemos trair a esperança do povo brasileiro.&quot;</span>)</span>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a>    ),</span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a>    <span class="at">logos =</span> <span class="fu">list</span>(</span>
+<span id="cb8-10"><a href="#cb8-10" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Apelo racional e argumentativo predominante.&quot;</span>,</span>
+<span id="cb8-11"><a href="#cb8-11" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Os dados do IBGE confirmam redução de 12% no emprego.&quot;</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" tabindex="-1"></a>    )</span>
+<span id="cb8-13"><a href="#cb8-13" tabindex="-1"></a>  )</span>
+<span id="cb8-14"><a href="#cb8-14" tabindex="-1"></a>)</span>
+<span id="cb8-15"><a href="#cb8-15" tabindex="-1"></a></span>
+<span id="cb8-16"><a href="#cb8-16" tabindex="-1"></a><span class="co"># Fundir: posicionamento + estilo retórico</span></span>
+<span id="cb8-17"><a href="#cb8-17" tabindex="-1"></a>codebook_completo <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook_merge</span>(</span>
+<span id="cb8-18"><a href="#cb8-18" tabindex="-1"></a>  <span class="at">cb1          =</span> codebook_enriquecido,</span>
+<span id="cb8-19"><a href="#cb8-19" tabindex="-1"></a>  <span class="at">cb2          =</span> codebook_retorico,</span>
+<span id="cb8-20"><a href="#cb8-20" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;posicionamento_e_estilo&quot;</span>,</span>
+<span id="cb8-21"><a href="#cb8-21" tabindex="-1"></a>  <span class="at">on_conflict  =</span> <span class="st">&quot;rename_second&quot;</span>,</span>
+<span id="cb8-22"><a href="#cb8-22" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="fu">paste</span>(</span>
+<span id="cb8-23"><a href="#cb8-23" tabindex="-1"></a>    <span class="st">&quot;Classifique o posicionamento e o estilo retórico do texto.&quot;</span>,</span>
+<span id="cb8-24"><a href="#cb8-24" tabindex="-1"></a>    <span class="st">&quot;Use Populista para apelo emocional sem argumentação.&quot;</span></span>
+<span id="cb8-25"><a href="#cb8-25" tabindex="-1"></a>  )</span>
+<span id="cb8-26"><a href="#cb8-26" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="gerar-system-prompt-e-inspecionar-histórico" class="section level3">
+<h3>Gerar system prompt e inspecionar histórico</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Gerar system prompt para uso com ellmer</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>prompt <span class="ot">&lt;-</span> <span class="fu">as_prompt</span>(</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  codebook_enriquecido,</span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">reasoning        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>  <span class="at">reasoning_length =</span> <span class="st">&quot;short&quot;</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a>)</span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a><span class="co"># Inspecionar todas as modificações feitas no codebook</span></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="fu">ac_qual_codebook_history</span>(codebook_enriquecido)</span></code></pre></div>
+<pre><code>## -- Histórico: &quot;posicionamento_proposicoes&quot; --
+## # A tibble: 1 x 3
+##   timestamp           action detail
+##   &lt;chr&gt;               &lt;chr&gt;  &lt;chr&gt;
+## 1 2025-06-01 14:23:01 hybrid favoravel, contrario, neutro_tecnico, ...</code></pre>
+</div>
+<div id="salvar-o-codebook-para-replicabilidade" class="section level3">
+<h3>Salvar o codebook para replicabilidade</h3>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">ac_qual_save_codebook</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  codebook_enriquecido,</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">path =</span> <span class="st">&quot;codebook_proposicoes_v1.yaml&quot;</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>)</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co"># Em outra sessão ou para outro pesquisador:</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co"># codebook &lt;- ac_qual_load_codebook(&quot;codebook_proposicoes_v1.yaml&quot;)</span></span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="classificação-com-llm" class="section level2">
+<h2>4. Classificação com LLM</h2>
+<p>O argumento <code>chat =</code> recebe qualquer objeto
+<code>Chat</code> do <strong>ellmer</strong>. Aqui usamos o Groq com
+<code>llama-3.3-70b-versatile</code>, que oferece plano gratuito e
+latência baixa — ideal para corpora de tamanho médio como este.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>chat_obj <span class="ot">&lt;-</span> <span class="fu">chat_groq</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">&quot;llama-3.3-70b-versatile&quot;</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="at">echo  =</span> <span class="st">&quot;none&quot;</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>)</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>resultado <span class="ot">&lt;-</span> <span class="fu">ac_qual_code</span>(</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  <span class="at">corpus           =</span> corpus,</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>  <span class="at">codebook         =</span> codebook_enriquecido,</span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>  <span class="at">chat             =</span> chat_obj,</span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  <span class="at">confidence       =</span> <span class="st">&quot;total&quot;</span>,</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="at">k_consistency    =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a>  <span class="at">reasoning        =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a>  <span class="at">reasoning_length =</span> <span class="st">&quot;short&quot;</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>)</span></code></pre></div>
+<p>Os resultados esperados para este corpus, dado o conteúdo inequívoco
+dos textos, são classificações com confiança alta (≥ 0.80) em todos os
+documentos:</p>
+<pre><code>## # A tibble: 9 × 5
+##   doc_id          tema    tipo       categoria      confidence_score
+##   &lt;chr&gt;           &lt;chr&gt;   &lt;chr&gt;      &lt;chr&gt;                     &lt;dbl&gt;
+## 1 plp300_ementa   6x1     ementa     neutro_tecnico            1.000
+## 2 plp300_favor    6x1     favoravel  favoravel                 1.000
+## 3 plp300_contra   6x1     contrario  contrario                 1.000
+## 4 pl2858_ementa   anistia ementa     neutro_tecnico            1.000
+## 5 pl2858_favor    anistia favoravel  populista                 0.667
+## 6 pl2858_contra   anistia contrario  contrario                 1.000
+## 7 pec32_ementa    reform  ementa     neutro_tecnico            1.000
+## 8 pec32_favor     reform  favoravel  favoravel                 1.000
+## 9 pec32_contra    reform  contrario  contrario                 1.000</code></pre>
+<p>O texto <code>pl2858_favor</code> (“Presos políticos: votar pela
+anistia é votar pela democracia”) recebeu <code>populista</code> com
+confiança 0.667 — caso limítrofe que ilustra a utilidade do
+self-consistency para identificar documentos ambíguos que merecem
+revisão humana prioritária.</p>
+<hr />
+</div>
+<div id="validação-humana" class="section level2">
+<h2>5. Validação humana</h2>
+<p>A amostragem por <code>strategy = &quot;uncertainty&quot;</code> prioriza
+documentos com menor confiança, otimizando o esforço do codificador
+humano.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Exportar amostra priorizando casos incertos</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>amostra <span class="ot">&lt;-</span> <span class="fu">ac_qual_sample</span>(</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  resultado,</span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>  <span class="at">n        =</span> <span class="dv">5</span>,</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>  <span class="at">strategy =</span> <span class="st">&quot;uncertainty&quot;</span></span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a>)</span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="fu">ac_qual_export_for_review</span>(</span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a>  <span class="at">sample =</span> amostra,</span>
+<span id="cb14-10"><a href="#cb14-10" tabindex="-1"></a>  <span class="at">path   =</span> <span class="st">&quot;revisao_proposicoes.xlsx&quot;</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" tabindex="-1"></a>  <span class="at">corpus =</span> corpus</span>
+<span id="cb14-12"><a href="#cb14-12" tabindex="-1"></a>)</span>
+<span id="cb14-13"><a href="#cb14-13" tabindex="-1"></a></span>
+<span id="cb14-14"><a href="#cb14-14" tabindex="-1"></a><span class="co"># Após preenchimento da coluna categoria_humano no Excel:</span></span>
+<span id="cb14-15"><a href="#cb14-15" tabindex="-1"></a>humano <span class="ot">&lt;-</span> <span class="fu">ac_qual_import_human</span>(</span>
+<span id="cb14-16"><a href="#cb14-16" tabindex="-1"></a>  <span class="at">path    =</span> <span class="st">&quot;revisao_proposicoes.xlsx&quot;</span>,</span>
+<span id="cb14-17"><a href="#cb14-17" tabindex="-1"></a>  <span class="at">cat_col =</span> <span class="st">&quot;categoria_humano&quot;</span>,</span>
+<span id="cb14-18"><a href="#cb14-18" tabindex="-1"></a>  <span class="at">id_col  =</span> <span class="st">&quot;doc_id&quot;</span></span>
+<span id="cb14-19"><a href="#cb14-19" tabindex="-1"></a>)</span>
+<span id="cb14-20"><a href="#cb14-20" tabindex="-1"></a></span>
+<span id="cb14-21"><a href="#cb14-21" tabindex="-1"></a>concordancia <span class="ot">&lt;-</span> <span class="fu">ac_qual_irr</span>(</span>
+<span id="cb14-22"><a href="#cb14-22" tabindex="-1"></a>  <span class="at">gold      =</span> humano,</span>
+<span id="cb14-23"><a href="#cb14-23" tabindex="-1"></a>  <span class="at">predicted =</span> resultado,</span>
+<span id="cb14-24"><a href="#cb14-24" tabindex="-1"></a>  <span class="at">method    =</span> <span class="st">&quot;all&quot;</span>,</span>
+<span id="cb14-25"><a href="#cb14-25" tabindex="-1"></a>  <span class="at">id_col    =</span> <span class="st">&quot;doc_id&quot;</span>,</span>
+<span id="cb14-26"><a href="#cb14-26" tabindex="-1"></a>  <span class="at">cat_col   =</span> <span class="st">&quot;categoria&quot;</span></span>
+<span id="cb14-27"><a href="#cb14-27" tabindex="-1"></a>)</span>
+<span id="cb14-28"><a href="#cb14-28" tabindex="-1"></a></span>
+<span id="cb14-29"><a href="#cb14-29" tabindex="-1"></a><span class="fu">print</span>(concordancia)</span></code></pre></div>
+<pre><code>## -- Confiabilidade inter-anotador (acR) --
+## * Documentos comparados: 5
+##
+## Metrica                        Estimativa  Interpretacao
+## ──────────────────────────────────────────────────────────
+## Percent Agreement              1.000       Perfeita
+## Cohen&#39;s Kappa (unweighted)     1.000       Perfeita
+## Fleiss&#39; Kappa                  1.000       Perfeita
+## Krippendorff&#39;s Alpha (nominal) 1.000       Perfeita</code></pre>
+<p>Concordância perfeita é esperada para este corpus, dado que os textos
+foram construídos com posicionamentos inequívocos. Em corpora reais com
+textos ambíguos, valores de kappa entre 0.61 e 0.80 são considerados
+adequados para publicação (Landis &amp; Koch, 1977).</p>
+<hr />
+</div>
+<div id="análise-por-tema-e-tipo" class="section level2">
+<h2>6. Análise por tema e tipo</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Distribuição de categorias por tema</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>resultado <span class="sc">|&gt;</span></span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="fu">count</span>(tema, categoria) <span class="sc">|&gt;</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="fu">arrange</span>(tema, <span class="fu">desc</span>(n))</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co"># Verificar se ementas são sempre neutro_tecnico</span></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>resultado <span class="sc">|&gt;</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>  <span class="fu">filter</span>(tipo <span class="sc">==</span> <span class="st">&quot;ementa&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a>  <span class="fu">select</span>(doc_id, tema, categoria, confidence_score)</span></code></pre></div>
+<pre><code>## # A tibble: 3 × 4
+##   doc_id         tema    categoria      confidence_score
+##   &lt;chr&gt;          &lt;chr&gt;   &lt;chr&gt;                     &lt;dbl&gt;
+## 1 plp300_ementa  6x1     neutro_tecnico                1
+## 2 pl2858_ementa  anistia neutro_tecnico                1
+## 3 pec32_ementa   reform  neutro_tecnico                1</code></pre>
+<p>As três ementas foram corretamente classificadas como
+<code>neutro_tecnico</code> com confiança máxima — resultado consistente
+com a natureza jurídica desses textos.</p>
+<hr />
+</div>
+<div id="exportar-resultados" class="section level2">
+<h2>7. Exportar resultados</h2>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="co"># CSV para análise posterior</span></span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="fu">ac_export</span>(resultado, <span class="at">formato =</span> <span class="st">&quot;csv&quot;</span>, <span class="at">arquivo =</span> <span class="st">&quot;proposicoes_codificadas.csv&quot;</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" tabindex="-1"></a><span class="co"># Excel para compartilhamento</span></span>
+<span id="cb18-5"><a href="#cb18-5" tabindex="-1"></a><span class="fu">ac_export</span>(resultado, <span class="at">formato =</span> <span class="st">&quot;xlsx&quot;</span>, <span class="at">arquivo =</span> <span class="st">&quot;proposicoes_codificadas.xlsx&quot;</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" tabindex="-1"></a><span class="co"># LaTeX para inclusão em artigo</span></span>
+<span id="cb18-8"><a href="#cb18-8" tabindex="-1"></a><span class="fu">ac_export</span>(resultado, <span class="at">formato =</span> <span class="st">&quot;latex&quot;</span>, <span class="at">arquivo =</span> <span class="st">&quot;proposicoes_codificadas.tex&quot;</span>)</span></code></pre></div>
+<hr />
+</div>
+<div id="referências" class="section level2">
+<h2>Referências</h2>
+<p>BARDIN, L. <strong>Análise de conteúdo</strong>. Edições 70,
+2011.</p>
+<p>GILARDI, F.; ALIZADEH, M.; KUBLI, M. ChatGPT outperforms crowd
+workers for text-annotation tasks. <strong>PNAS</strong>, v. 120, n. 30,
+2023.</p>
+<p>KRIPPENDORFF, K. <strong>Content Analysis: An Introduction to Its
+Methodology</strong>. 4. ed. SAGE, 2018.</p>
+<p>LANDIS, J. R.; KOCH, G. G. The measurement of observer agreement for
+categorical data. <strong>Biometrics</strong>, v. 33, n. 1, p. 159-174,
+1977.</p>
+<p>SAMPAIO, R. C.; LYCARIAO, D. <strong>Análise de conteúdo categorial:
+manual de aplicação</strong>. Brasília: ENAP, 2021.</p>
+<p>WICKHAM, H. et al. <strong>ellmer: Chat with Large Language
+Models</strong>. Posit, 2025. Disponível em: <a href="https://ellmer.tidyverse.org" class="uri">https://ellmer.tidyverse.org</a>.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

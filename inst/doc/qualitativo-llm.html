@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Análise de Conteúdo Qualitativa com LLMs</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Análise de Conteúdo Qualitativa com
+LLMs</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#vis%C3%A3o-geral" id="toc-visão-geral">Visão
+geral</a></li>
+<li><a href="#quando-usar-llm-e-quando-n%C3%A3o-usar" id="toc-quando-usar-llm-e-quando-não-usar">Quando usar LLM (e quando
+<strong>não</strong> usar)</a></li>
+<li><a href="#instala%C3%A7%C3%A3o-e-configura%C3%A7%C3%A3o" id="toc-instalação-e-configuração">Instalação e configuração</a></li>
+<li><a href="#etapa-1-criar-o-codebook" id="toc-etapa-1-criar-o-codebook">Etapa 1 — Criar o codebook</a></li>
+<li><a href="#etapa-2-enriquecer-o-codebook-com-literatura" id="toc-etapa-2-enriquecer-o-codebook-com-literatura">Etapa 2 —
+Enriquecer o codebook com literatura</a></li>
+<li><a href="#etapa-3-fundir-e-traduzir-codebooks" id="toc-etapa-3-fundir-e-traduzir-codebooks">Etapa 3 — Fundir e traduzir
+codebooks</a></li>
+<li><a href="#etapa-4-inspecionar-hist%C3%B3rico-e-gerar-system-prompt" id="toc-etapa-4-inspecionar-histórico-e-gerar-system-prompt">Etapa 4 —
+Inspecionar histórico e gerar system prompt</a></li>
+<li><a href="#etapa-5-classificar-o-corpus" id="toc-etapa-5-classificar-o-corpus">Etapa 5 — Classificar o
+corpus</a></li>
+<li><a href="#etapa-6-salvar-e-carregar" id="toc-etapa-6-salvar-e-carregar">Etapa 6 — Salvar e carregar</a></li>
+<li><a href="#etapa-7-valida%C3%A7%C3%A3o-e-confiabilidade" id="toc-etapa-7-validação-e-confiabilidade">Etapa 7 — Validação e
+confiabilidade</a></li>
+<li><a href="#diagnosticando-problemas-comuns" id="toc-diagnosticando-problemas-comuns">Diagnosticando problemas
+comuns</a></li>
+<li><a href="#etapa-8-replicabilidade-e-transpar%C3%AAncia" id="toc-etapa-8-replicabilidade-e-transparência">Etapa 8 —
+Replicabilidade e transparência</a></li>
+<li><a href="#refer%C3%AAncias" id="toc-referências">Referências</a></li>
+</ul>
+</div>
+
+<div id="visão-geral" class="section level2">
+<h2>Visão geral</h2>
+<p>O módulo qualitativo do <strong>acR</strong> implementa um pipeline
+completo de análise de conteúdo assistida por modelos de linguagem
+(LLMs), seguindo as diretrizes metodológicas de Krippendorff (2018) e as
+recomendações empíricas de Gilardi, Alizadeh e Kubli (2023), que
+mostraram que LLMs modernas superam trabalhadores de plataformas em
+várias tarefas de anotação de textos políticos — <strong>desde que
+guiadas por um codebook bem construído e validadas por revisão
+humana</strong>.</p>
+<p>O pipeline tem sete etapas encadeadas:</p>
+<pre><code>ac_fetch_camara() / ac_fetch_senado()        ← coleta
+         ↓
+ac_corpus()                                  ← estruturação
+         ↓
+ac_qual_codebook() + funções de gestão       ← codebook
+         ↓
+as_prompt()                                  ← system prompt (opcional)
+         ↓
+ac_qual_code()                               ← classificação com LLM
+         ↓
+ac_qual_sample() + ac_qual_reliability()     ← validação humana
+         ↓
+ac_qual_report()                             ← relatório reprodutível</code></pre>
+<p>A função <code>ac_qual_code()</code> aceita o argumento
+<code>chat =</code>, que recebe qualquer objeto <code>Chat</code> do
+pacote <strong>ellmer</strong> (Wickham et al., 2025). Isso permite usar
+qualquer provedor — Groq, OpenAI, Anthropic, Google Gemini, Ollama,
+Mistral, DeepSeek, OpenRouter — sem alterar a lógica de análise. Também
+suporta modelos locais via Ollama para pesquisas com dados
+sensíveis.</p>
+<blockquote>
+<p><strong>Por que um codebook explícito?</strong> A alternativa naïve
+seria pedir para o modelo “classificar o texto como positivo ou
+negativo”. Isso funciona mal porque cada LLM tem prior próprio sobre o
+que essas palavras significam. Um codebook transforma a classificação em
+<strong>operacionalização reproduzível</strong>: outro pesquisador
+(humano ou LLM) chega aos mesmos rótulos aplicando as mesmas definições
+e exemplos.</p>
+</blockquote>
+</div>
+<div id="quando-usar-llm-e-quando-não-usar" class="section level2">
+<h2>Quando usar LLM (e quando <strong>não</strong> usar)</h2>
+<p>Antes de acender API, vale escolher a técnica certa para a pergunta.
+LLM não é o melhor caminho para todo problema de análise de conteúdo — é
+caro, tem variabilidade estocástica e depende de um provedor externo. A
+tabela abaixo resume quando <strong>cada</strong> abordagem do
+<code>acR</code> faz sentido:</p>
+<table>
+<colgroup>
+<col width="47%" />
+<col width="52%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Você quer…</th>
+<th>Use</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Rotular textos com <strong>categorias teóricas
+pré-definidas</strong> (populismo, framing)</td>
+<td>LLM + codebook — esta vignette</td>
+</tr>
+<tr class="even">
+<td>Medir <strong>valência afetiva</strong> (positivo/negativo/neutro)
+em português</td>
+<td><code>ac_sentiment()</code> (léxico OpLexicon) — mais rápido,
+determinístico, sem chave de API</td>
+</tr>
+<tr class="odd">
+<td>Descobrir <strong>tópicos emergentes</strong> sem categorias a
+priori</td>
+<td><code>ac_lda()</code> — modelo probabilístico não
+supervisionado</td>
+</tr>
+<tr class="even">
+<td>Detectar <strong>tipologias latentes</strong> para amostragem
+estratificada</td>
+<td><code>ac_cluster_documents()</code> — hard clustering; veja a
+<code>vignette(&quot;cluster&quot;)</code></td>
+</tr>
+<tr class="odd">
+<td><strong>Comparar</strong> vocabulário entre dois ou mais grupos</td>
+<td><code>ac_keyness()</code> — teste estatístico, sem LLM</td>
+</tr>
+<tr class="even">
+<td><strong>Explorar</strong> vocabulário distintivo dentro de cada
+documento</td>
+<td><code>ac_tf_idf()</code></td>
+</tr>
+</tbody>
+</table>
+<p>Regra prática: <strong>se a categoria pode ser detectada por
+palavras-chave, use léxico ou keyness — é mais barato, reprodutível e
+defensável.</strong> LLM brilha quando a categoria depende de
+<strong>contexto, ironia, referência implícita ou raciocínio sobre
+argumento</strong> — populismo, framing, posicionamento, tom, estilo
+retórico.</p>
+<div id="custo-real-de-um-estudo-com-llm" class="section level3">
+<h3>Custo real de um estudo com LLM</h3>
+<p>Para calibrar expectativas, estimativa em dólares para um corpus
+típico brasileiro (500 discursos parlamentares, ~800 tokens cada) com
+<code>k_consistency = 3</code> e
+<code>reasoning = TRUE, reasoning_length = &quot;medium&quot;</code>:</p>
+<table>
+<thead>
+<tr class="header">
+<th>Modelo</th>
+<th>Custo estimado</th>
+<th>Tempo estimado</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>groq/llama-3.3-70b-versatile</code></td>
+<td>US$ 0,50 – 1</td>
+<td>~10 min</td>
+</tr>
+<tr class="even">
+<td><code>openai/gpt-4o-mini</code></td>
+<td>US$ 3 – 5</td>
+<td>~15 min</td>
+</tr>
+<tr class="odd">
+<td><code>anthropic/claude-sonnet-4-5</code></td>
+<td>US$ 10 – 20</td>
+<td>~25 min</td>
+</tr>
+<tr class="even">
+<td><code>anthropic/claude-opus-4-7</code></td>
+<td>US$ 40 – 80</td>
+<td>~40 min</td>
+</tr>
+<tr class="odd">
+<td><code>ollama/llama3.1:70b</code> (local)</td>
+<td>US$ 0 (GPU)</td>
+<td>~2 h em RTX 4090</td>
+</tr>
+</tbody>
+</table>
+<p><code>ac_qual_recommend_model()</code> (chamado a seguir) sugere o
+modelo mais custo-efetivo para o tamanho e a dificuldade da sua
+tarefa.</p>
+<hr />
+</div>
+</div>
+<div id="instalação-e-configuração" class="section level2">
+<h2>Instalação e configuração</h2>
+<p>Antes de começar, garanta que o <code>ellmer</code> está instalado e
+que a chave da API do seu provedor está no ambiente
+(<code>.Renviron</code> é o local usual — nunca no código
+versionado):</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># Instalar acR</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;andersonheri/acR&quot;</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co"># Instalar ellmer</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;ellmer&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co"># Configurar chave de API (exemplo: Anthropic)</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="fu">Sys.setenv</span>(<span class="at">ANTHROPIC_API_KEY =</span> <span class="st">&quot;sk-ant-...&quot;</span>)</span></code></pre></div>
+<p>Se você não sabe qual provedor escolher, use
+<code>ac_qual_recommend_model()</code> — a função consulta um banco
+interno com custo, contexto e qualidade estimada por tipo de tarefa, sem
+precisar de rede.</p>
+<hr />
+</div>
+<div id="etapa-1-criar-o-codebook" class="section level2">
+<h2>Etapa 1 — Criar o codebook</h2>
+<p>O codebook é o instrumento central da análise de conteúdo. Ele define
+as <strong>categorias analíticas</strong>, suas <strong>definições
+operacionais</strong>, <strong>exemplos</strong> positivos (o que É a
+categoria) e negativos (o que NÃO é, para desambiguar categorias
+vizinhas), e <strong>pesos</strong> relativos que orientam a LLM em
+fronteiras difíceis.</p>
+<blockquote>
+<p><strong>Dica metodológica:</strong> exemplos negativos são
+frequentemente subestimados. Um exemplo negativo para “populista” — como
+“Apresento esta emenda técnica” — ajuda muito mais que dois positivos
+adicionais. Eles servem de contraste, reduzindo confusões entre
+categorias similares.</p>
+</blockquote>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(acR)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>cb <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;tom_discurso&quot;</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">&quot;Classifique o tom geral do discurso parlamentar.&quot;</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">categories   =</span> <span class="fu">list</span>(</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>    <span class="at">positivo =</span> <span class="fu">list</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Discurso com tom propositivo e colaborativo.&quot;</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Proponho que trabalhemos juntos nesta agenda.&quot;</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>      <span class="at">examples_neg =</span> <span class="fu">c</span>(<span class="st">&quot;Este governo é um desastre completo.&quot;</span>),</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>      <span class="at">weight       =</span> <span class="dv">1</span></span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>    ),</span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>    <span class="at">negativo =</span> <span class="fu">list</span>(</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Discurso com tom crítico ou confrontacional.&quot;</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Esta proposta vai arruinar o país.&quot;</span>),</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>      <span class="at">examples_neg =</span> <span class="fu">c</span>(<span class="st">&quot;Apresento esta emenda para melhorar o texto.&quot;</span>),</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>      <span class="at">weight       =</span> <span class="fl">1.5</span>  <span class="co"># categoria mais difícil: peso maior no prompt</span></span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>    ),</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>    <span class="at">neutro =</span> <span class="fu">list</span>(</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Discurso descritivo, sem posicionamento claro.&quot;</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;O projeto foi apresentado na sessão de hoje.&quot;</span>),</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>      <span class="at">weight       =</span> <span class="dv">1</span></span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>    )</span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  ),</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  <span class="at">multilabel =</span> <span class="cn">FALSE</span>,   <span class="co"># cada doc recebe UMA categoria</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  <span class="at">lang       =</span> <span class="st">&quot;pt&quot;</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>)</span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; ! Categoria &quot;neutro&quot;: sem exemplos negativos (examples_neg).</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; ℹ Exemplos negativos reduzem confusão entre categorias similares.</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="fu">print</span>(cb)</span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt; ── Codebook acR: &quot;tom_discurso&quot; ────────────────────────────────────────────────</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; • Modo: &quot;manual&quot;</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; • Categorias (3): &quot;positivo&quot;, &quot;negativo&quot;, and &quot;neutro&quot;</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt; • Multilabel: FALSE</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; • Idioma: &quot;pt&quot;</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; • Criado em: 29/07/2026 12:31</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt; Instrução geral:</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; Classifique o tom geral do discurso parlamentar.</span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; Categorias:</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; • &quot;positivo&quot;: Discurso com tom propositivo e colaborativo.</span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; Ex+: Proponho que trabalhemos juntos nesta agenda.</span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt; • &quot;negativo&quot; [peso: 1.5]: Discurso com tom crítico ou confrontacional.</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt; Ex+: Esta proposta vai arruinar o país.</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt; • &quot;neutro&quot;: Discurso descritivo, sem posicionamento claro.</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt; Ex+: O projeto foi apresentado na sessão de hoje.</span></span></code></pre></div>
+<div id="adicionar-e-remover-categorias" class="section level3">
+<h3>Adicionar e remover categorias</h3>
+<p>Codebooks quase nunca ficam corretos na primeira tentativa. As
+funções <code>ac_qual_codebook_add()</code> e
+<code>ac_qual_codebook_remove()</code> permitem <strong>refinamento
+iterativo</strong> — comum quando você roda o codebook numa amostra
+piloto e percebe que faltou uma categoria (“técnico”) ou que duas se
+sobrepõem.</p>
+<p>Todas as modificações ficam registradas em
+<code>codebook$history</code> para reprodutibilidade metodológica.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a><span class="co"># Adicionar categoria iterativamente</span></span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>cb <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook_add</span>(cb,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">tecnico =</span> <span class="fu">list</span>(</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>    <span class="at">definition   =</span> <span class="st">&quot;Discurso com linguagem técnica e referências normativas.&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a>    <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Conforme o art. 37 da CF, a administração pública...&quot;</span>),</span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>    <span class="at">weight       =</span> <span class="dv">1</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>  )</span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a>)</span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co"># Remover se necessário</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a>cb <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook_remove</span>(cb, <span class="st">&quot;tecnico&quot;</span>)</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="etapa-2-enriquecer-o-codebook-com-literatura" class="section level2">
+<h2>Etapa 2 — Enriquecer o codebook com literatura</h2>
+<p>Definir categorias apenas com base no conhecimento do pesquisador
+funciona, mas ancorar as definições em literatura publicada aumenta a
+<strong>validade de construto</strong>. O <code>acR</code> oferece dois
+modos automatizados:</p>
+<ul>
+<li><strong>Híbrido</strong> (<code>ac_qual_codebook_hybrid</code>):
+parte do seu codebook manual e <strong>enriquece</strong> cada categoria
+com citações teóricas relevantes, sem alterar os exemplos que você já
+validou.</li>
+<li><strong>Literature</strong> (<code>mode = &quot;literature&quot;</code>):
+constrói o codebook <strong>do zero</strong> a partir da literatura
+sobre um conceito. Útil quando você tem clareza do conceito teórico mas
+quer que o pacote extraia as dimensões operacionais.</li>
+</ul>
+<div id="modo-híbrido-definições-ancoradas-em-referências" class="section level3">
+<h3>Modo híbrido: definições ancoradas em referências</h3>
+<p><code>ac_qual_codebook_hybrid()</code> re-ancora as definições
+manuais em referências bibliográficas buscadas via LLM, preservando os
+exemplos originais:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>cb_hybrid <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook_hybrid</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">codebook =</span> cb,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">model    =</span> <span class="st">&quot;anthropic/claude-sonnet-4-5&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">journals =</span> <span class="st">&quot;default&quot;</span>,  <span class="co"># periódicos de CP/CS brasileiros e internacionais</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">n_refs   =</span> <span class="dv">3</span><span class="dt">L</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">lang     =</span> <span class="st">&quot;pt&quot;</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>)</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co"># Ver definição enriquecida da categoria &quot;negativo&quot;</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="fu">cat</span>(cb_hybrid<span class="sc">$</span>categories<span class="sc">$</span>negativo<span class="sc">$</span>definition)</span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;</span><span class="sc">\n</span><span class="st">Referências:</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a><span class="fu">print</span>(cb_hybrid<span class="sc">$</span>categories<span class="sc">$</span>negativo<span class="sc">$</span>references)</span></code></pre></div>
+</div>
+<div id="modo-literature-construção-inteiramente-baseada-em-literatura" class="section level3">
+<h3>Modo literature: construção inteiramente baseada em literatura</h3>
+<p>Aqui você fornece o <strong>conceito</strong> que quer capturar (em
+inglês, para melhor recall na base OpenAlex) e o pacote gera categoria,
+definição e exemplos.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>cb_lit <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;frames_politicos&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">&quot;Identifique o frame predominante no discurso.&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">categories   =</span> <span class="fu">list</span>(</span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>    <span class="at">conflito    =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;&quot;</span>, <span class="at">concept =</span> <span class="st">&quot;conflict framing politics&quot;</span>),</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a>    <span class="at">consenso    =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;&quot;</span>, <span class="at">concept =</span> <span class="st">&quot;consensus framing politics&quot;</span>),</span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a>    <span class="at">moralidade  =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;&quot;</span>, <span class="at">concept =</span> <span class="st">&quot;moral framing political discourse&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  ),</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  <span class="at">mode  =</span> <span class="st">&quot;literature&quot;</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">&quot;anthropic/claude-sonnet-4-5&quot;</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="at">lang  =</span> <span class="st">&quot;pt&quot;</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="etapa-3-fundir-e-traduzir-codebooks" class="section level2">
+<h2>Etapa 3 — Fundir e traduzir codebooks</h2>
+<p>Análises multidimensionais frequentemente combinam duas ou mais
+tipologias (tom + estilo, posicionamento + tema, etc.).
+<code>ac_qual_codebook_merge()</code> faz essa combinação, com controle
+de conflitos entre categorias de mesmo nome.</p>
+<p>Traduzir codebooks é útil para: <strong>replicabilidade
+internacional</strong> (publicar versão em inglês do instrumento),
+<strong>corpora bilíngues</strong>, ou apenas para checar se as
+definições sobrevivem sem ambiguidade em outra língua.</p>
+<div id="fundir-dois-codebooks" class="section level3">
+<h3>Fundir dois codebooks</h3>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>cb_estilo <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;estilo_retórico&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">&quot;Classifique o estilo retórico dominante.&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">categories   =</span> <span class="fu">list</span>(</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>    <span class="at">pathos  =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;Apelo emocional predominante.&quot;</span>),</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>    <span class="at">logos   =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;Apelo racional/argumentativo predominante.&quot;</span>),</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>    <span class="at">ethos   =</span> <span class="fu">list</span>(<span class="at">definition =</span> <span class="st">&quot;Apelo à autoridade ou credibilidade do orador.&quot;</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>  )</span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>)</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co"># Fundir: tom + estilo retórico em um único codebook</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a>cb_completo <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook_merge</span>(</span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a>  <span class="at">cb1          =</span> cb_hybrid,</span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a>  <span class="at">cb2          =</span> cb_estilo,</span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;discurso_parlamentar&quot;</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  <span class="at">on_conflict  =</span> <span class="st">&quot;rename_second&quot;</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="st">&quot;Classifique o tom e o estilo retórico do discurso.&quot;</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a>)</span></code></pre></div>
+</div>
+<div id="traduzir-para-inglês" class="section level3">
+<h3>Traduzir para inglês</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>cb_en <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook_translate</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  <span class="at">codebook           =</span> cb_completo,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">to                 =</span> <span class="st">&quot;en&quot;</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>  <span class="at">model              =</span> <span class="st">&quot;anthropic/claude-sonnet-4-5&quot;</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>  <span class="at">translate_examples =</span> <span class="cn">TRUE</span></span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a>)</span></code></pre></div>
+<hr />
+</div>
+</div>
+<div id="etapa-4-inspecionar-histórico-e-gerar-system-prompt" class="section level2">
+<h2>Etapa 4 — Inspecionar histórico e gerar system prompt</h2>
+<p>Todo codebook mantém um <code>history</code> das modificações — quem
+alterou, quando e o quê. Isso é essencial para publicação: o revisor
+pode auditar exatamente como o instrumento foi construído.</p>
+<p>O <code>as_prompt()</code> converte o objeto <code>ac_codebook</code>
+em uma string de <strong>system prompt</strong> formatada, pronta para
+ser injetada num objeto <code>Chat</code> do <code>ellmer</code>. Você
+pode usar essa string diretamente se quiser rodar a classificação com
+sua própria lógica de retry/paralelismo.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a><span class="co"># Ver todas as modificações feitas no codebook</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a><span class="fu">ac_qual_codebook_history</span>(cb_completo)</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a><span class="co"># Gerar system prompt para uso direto com ellmer</span></span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>prompt <span class="ot">&lt;-</span> <span class="fu">as_prompt</span>(</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  cb_completo,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="at">reasoning        =</span> <span class="cn">TRUE</span>,           <span class="co"># pede raciocinio estruturado</span></span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="at">reasoning_length =</span> <span class="st">&quot;medium&quot;</span>        <span class="co"># &quot;short&quot; | &quot;medium&quot; | &quot;detailed&quot;</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>)</span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co"># O prompt pode ser passado diretamente a um objeto Chat:</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co"># chat$set_system_prompt(prompt)</span></span></code></pre></div>
+<blockquote>
+<p><strong>Sobre <code>reasoning</code>:</strong> pedir raciocínio
+<em>aumenta</em> a qualidade da classificação em casos difíceis (o
+modelo “pensa antes de responder”), mas <strong>dobra o custo</strong>
+por documento (mais tokens gerados). Use <code>&quot;short&quot;</code> como
+padrão; <code>&quot;detailed&quot;</code> só quando você planeja auditar decisões
+individualmente.</p>
+</blockquote>
+<hr />
+</div>
+<div id="etapa-5-classificar-o-corpus" class="section level2">
+<h2>Etapa 5 — Classificar o corpus</h2>
+<p>Com codebook pronto e corpus estruturado, <code>ac_qual_code()</code>
+faz a classificação em lotes. Três parâmetros são chave:</p>
+<ul>
+<li><code>k_consistency</code>: número de repetições de
+<em>self-consistency</em> (Wang et al., 2022). O mesmo texto é
+classificado k× (padrão 3) com pequena variação de temperatura, e a
+categoria final é a moda. O <code>confidence_score</code> sai daí — 1.0
+= todas as k rodadas concordaram; 0.67 = 2 de 3.</li>
+<li><code>reasoning</code>: pede raciocínio estruturado em JSON.</li>
+<li><code>live</code>: <strong>visualização em tempo real</strong> da
+classificação, tirando o processo do “caixa-preta”. Ver blockquote
+abaixo.</li>
+</ul>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a><span class="fu">library</span>(ellmer)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co"># Coletar e estruturar corpus</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>discursos <span class="ot">&lt;-</span> <span class="fu">ac_fetch_camara</span>(</span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>  <span class="at">id_deputado =</span> <span class="dv">204379</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a>  <span class="at">data_inicio =</span> <span class="st">&quot;2023-01-01&quot;</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>  <span class="at">data_fim    =</span> <span class="st">&quot;2023-06-30&quot;</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a>)</span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a>corpus <span class="ot">&lt;-</span> <span class="fu">ac_corpus</span>(discursos, <span class="at">text_col =</span> <span class="st">&quot;transcricao&quot;</span>, <span class="at">id_col =</span> <span class="st">&quot;id&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co"># Classificar</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>chat <span class="ot">&lt;-</span> <span class="fu">chat_anthropic</span>(<span class="at">model =</span> <span class="st">&quot;claude-sonnet-4-5&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>resultado <span class="ot">&lt;-</span> <span class="fu">ac_qual_code</span>(</span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  <span class="at">corpus        =</span> corpus,</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  <span class="at">codebook      =</span> cb_completo,</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  <span class="at">chat          =</span> chat,</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>  <span class="at">k_consistency =</span> <span class="dv">3</span>,               <span class="co"># self-consistency</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>  <span class="at">live          =</span> <span class="st">&quot;terminal&quot;</span>       <span class="co"># ver a maquina classificando ao vivo</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>)</span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="fu">head</span>(resultado)</span></code></pre></div>
+<p>O tibble de saída traz: <code>doc_id</code>, <code>categoria</code>,
+<code>confidence_score</code> (via <em>self-consistency</em>),
+<code>reasoning</code> (raciocínio do modelo, se pedido) e os metadados
+originais do corpus.</p>
+<div id="live-view-tirando-o-llm-do-caixa-preta" class="section level3">
+<h3>Live view: tirando o LLM do caixa-preta</h3>
+<p>O argumento <code>live</code> de <code>ac_qual_code()</code> mostra a
+máquina classificando em tempo real. Três modos:</p>
+<ul>
+<li><code>live = &quot;off&quot;</code> (padrão) — sem visualização.</li>
+<li><code>live = &quot;terminal&quot;</code> — barra de progresso <code>cli</code>
+com doc atual, categoria, confiança e início do raciocínio. Zero
+dependências, roda em qualquer setup (batch, CI, servidor sem interface
+gráfica).</li>
+<li><code>live = &quot;shiny&quot;</code> — janela Shiny em background com tabela
+atualizando a cada 500 ms, destaque para casos de baixa confiança.
+Requer <code>shiny</code> e <code>callr</code>. Ideal para apresentações
+e demonstrações.</li>
+</ul>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>resultado <span class="ot">&lt;-</span> <span class="fu">ac_qual_code</span>(</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>  corpus, cb_completo, <span class="at">chat =</span> chat,</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a>  <span class="at">live =</span> <span class="st">&quot;terminal&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a>)</span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co"># 42/120 | ============&gt;              35% | ETA 2m10s</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#   doc_042 -&gt; populista  (conf 1.00) &quot;Apela ao povo contra elite...&quot;</span></span></code></pre></div>
+<blockquote>
+<p><strong>Por que isso importa?</strong> Numa rodada de 500 documentos,
+sem <code>live</code> você não sabe se o modelo travou, se está
+devolvendo lixo, ou se está indo bem — só descobre no fim, depois de
+gastar todo o orçamento de tokens. Com <code>live = &quot;terminal&quot;</code>,
+você vê nos primeiros 10 docs se o raciocínio faz sentido e a
+distribuição de categorias está plausível. Se algo estiver errado,
+<code>Ctrl+C</code> e ajusta.</p>
+</blockquote>
+<hr />
+</div>
+</div>
+<div id="etapa-6-salvar-e-carregar" class="section level2">
+<h2>Etapa 6 — Salvar e carregar</h2>
+<p>Codebook e resultados devem ser <strong>serializados</strong> para
+replicabilidade. YAML foi escolhido por ser legível por humanos e
+versionável em Git.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a><span class="co"># Salvar em YAML para replicabilidade</span></span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">ac_qual_save_codebook</span>(cb_completo, <span class="at">path =</span> <span class="st">&quot;codebook_discurso.yaml&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a><span class="co"># Carregar em outra sessão</span></span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>cb_recarregado <span class="ot">&lt;-</span> <span class="fu">ac_qual_load_codebook</span>(<span class="st">&quot;codebook_discurso.yaml&quot;</span>)</span></code></pre></div>
+<hr />
+</div>
+<div id="etapa-7-validação-e-confiabilidade" class="section level2">
+<h2>Etapa 7 — Validação e confiabilidade</h2>
+<p><strong>Sem validação humana, não há análise de conteúdo
+publicável.</strong> LLM é uma ferramenta poderosa, mas nenhuma
+referência metodológica aceita hoje um estudo de análise categorial sem
+um subconjunto codificado por humano e métricas de concordância entre
+codificadores.</p>
+<p>O fluxo mínimo:</p>
+<ol style="list-style-type: decimal">
+<li><code>ac_qual_sample()</code>: seleciona uma amostra representativa
+(estratificada, ou priorizando casos incertos via
+<code>strategy = &quot;uncertainty&quot;</code>).</li>
+<li><code>ac_qual_export_for_review()</code>: exporta para
+<code>.xlsx</code> com a coluna <code>categoria_humano</code> em branco
+para o revisor preencher.</li>
+<li><code>ac_qual_import_human()</code>: reimporta o Excel
+preenchido.</li>
+<li><code>ac_qual_reliability()</code>: calcula percent agreement,
+<em>alpha</em> de Krippendorff, AC1 de Gwet e F1 macro, com IC 95% via
+<em>bootstrap</em>.</li>
+</ol>
+<blockquote>
+<p><strong>Quanto amostrar?</strong> Regra prática (Krippendorff 2018):
+pelo menos 10% do corpus, no mínimo 30 documentos, priorizando os casos
+com <code>confidence_score &lt; 0.8</code> (é onde o modelo mais tende a
+errar).</p>
+</blockquote>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a><span class="co"># Amostrar 30 documentos priorizando os incertos</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>amostra <span class="ot">&lt;-</span> <span class="fu">ac_qual_sample</span>(resultado, <span class="at">n =</span> <span class="dv">30</span>, <span class="at">strategy =</span> <span class="st">&quot;uncertainty&quot;</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="fu">ac_qual_export_for_review</span>(amostra, <span class="at">path =</span> <span class="st">&quot;revisao.xlsx&quot;</span>, <span class="at">corpus =</span> corpus)</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="co"># Após preenchimento manual, calcular IRR</span></span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a>revisado <span class="ot">&lt;-</span> <span class="fu">ac_qual_import_human</span>(<span class="st">&quot;revisao_preenchida.xlsx&quot;</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>irr      <span class="ot">&lt;-</span> <span class="fu">ac_qual_reliability</span>(<span class="at">llm =</span> resultado, <span class="at">human =</span> revisado)</span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="fu">print</span>(irr)</span></code></pre></div>
+<p>Interpretação (Landis &amp; Koch, 1977 / Gwet, 2014):</p>
+<table>
+<thead>
+<tr class="header">
+<th align="center">Alpha/Kappa</th>
+<th align="left">Interpretação</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">&lt; 0.20</td>
+<td align="left">Baixa concordância</td>
+</tr>
+<tr class="even">
+<td align="center">0.21 – 0.40</td>
+<td align="left">Razoável</td>
+</tr>
+<tr class="odd">
+<td align="center">0.41 – 0.60</td>
+<td align="left">Moderada</td>
+</tr>
+<tr class="even">
+<td align="center">0.61 – 0.80</td>
+<td align="left">Substancial</td>
+</tr>
+<tr class="odd">
+<td align="center">&gt; 0.80</td>
+<td align="left">Quase perfeita</td>
+</tr>
+</tbody>
+</table>
+<p>Para análises publicáveis, valores acima de <strong>0.67</strong>
+(Krippendorff) ou <strong>0.61</strong> (Landis-Koch) são geralmente
+aceitos, com discussão dos casos divergentes na seção de método.</p>
+<hr />
+</div>
+<div id="diagnosticando-problemas-comuns" class="section level2">
+<h2>Diagnosticando problemas comuns</h2>
+<p>Antes de partir para o relatório final, vale conhecer os quatro modos
+de falha mais frequentes de uma rodada com LLM — e o que cada um
+pede.</p>
+<div id="categorias-com-concordância-baixa-entre-k_consistency" class="section level3">
+<h3>1. Categorias com concordância baixa entre
+<code>k_consistency</code></h3>
+<p><strong>Sintoma:</strong> <code>confidence_score</code> mediano
+abaixo de 0,80.</p>
+<p><strong>Causa provável:</strong> definições ambíguas ou exemplos
+negativos ausentes. A LLM está literalmente hesitando entre categorias
+em cada repetição.</p>
+<p><strong>Fix:</strong> rodar
+<code>ac_qual_codebook(check_overlap = TRUE)</code> para detectar
+definições semanticamente próximas; adicionar exemplos negativos
+cruzados (o que uma categoria <strong>não</strong> é, especialmente
+perto das vizinhas); revisar manualmente 5–10 documentos com
+<code>confidence_score &lt; 0.67</code> e verificar se o problema está
+no texto (documento genuinamente ambíguo) ou no codebook.</p>
+</div>
+<div id="llm-devolve-categoria-fora-do-codebook" class="section level3">
+<h3>2. LLM devolve categoria fora do codebook</h3>
+<p><strong>Sintoma:</strong> categoria como “misto”, “outro” ou uma
+variante da sua (“populismo_forte”) que <strong>não está</strong> no
+<code>codebook$categories</code>.</p>
+<p><strong>Causa:</strong> o modelo entendeu a tarefa mas achou a
+categoria correta insuficiente.</p>
+<p><strong>Fix:</strong> ou você acrescenta a categoria emergente (via
+<code>ac_qual_codebook_add()</code>), ou reforça no prompt que
+<strong>só as categorias listadas</strong> são válidas. A segunda
+geralmente é preferível — categorias emergentes indicam refinamento
+metodológico, não desvio da LLM.</p>
+</div>
+<div id="distribuição-colapsada-em-uma-categoria" class="section level3">
+<h3>3. Distribuição colapsada em uma categoria</h3>
+<p><strong>Sintoma:</strong> 90%+ dos documentos vão para o mesmo
+rótulo.</p>
+<p><strong>Causa:</strong> categoria com definição muito abrangente ou
+peso implicitamente alto (mais exemplos positivos que as outras).</p>
+<p><strong>Fix:</strong> equilibrar o número de exemplos positivos por
+categoria; usar o argumento <code>weight</code> para dar peso extra às
+categorias mais raras; considerar <code>multilabel = TRUE</code> se os
+documentos genuinamente cobrem mais de um tema.</p>
+</div>
+<div id="irr-humana-llm-inaceitável" class="section level3">
+<h3>4. IRR humana × LLM inaceitável</h3>
+<p><strong>Sintoma:</strong> <code>ac_qual_reliability()</code> retorna
+α &lt; 0,60.</p>
+<p><strong>Causa:</strong> três possibilidades, em ordem de frequência:
+(i) codebook não está claro nem para humanos (peça a
+<strong>outro</strong> humano codificar; se dois humanos discordam, a
+LLM não vai salvar), (ii) modelo escolhido é pequeno demais para a
+tarefa (troque para um tier acima), (iii) o próprio conceito teórico é
+contestado — reformule a pergunta.</p>
+<blockquote>
+<p><strong>Regra de ouro:</strong> se a IRR entre dois humanos está
+abaixo de 0,70, o problema é do codebook, não da LLM. Nenhum modelo vai
+ter mais concordância consigo mesmo do que humanos treinados têm entre
+si.</p>
+</blockquote>
+</div>
+</div>
+<div id="etapa-8-replicabilidade-e-transparência" class="section level2">
+<h2>Etapa 8 — Replicabilidade e transparência</h2>
+<p>Análises com LLM têm um risco de comunicação: <strong>o revisor ou
+leitor não consegue reproduzir a rodada</strong> sem saber exatamente
+que modelo, que codebook, que parâmetros e que amostra foram usados.
+<code>ac_qual_report()</code> gera um documento estruturado com
+<strong>todas essas decisões</strong>, pronto para anexar como material
+suplementar de um artigo ou como apêndice metodológico.</p>
+<p>O relatório cobre oito seções:</p>
+<ol style="list-style-type: decimal">
+<li><strong>Metadados</strong> — data, versão do <code>acR</code>,
+autor(es), método</li>
+<li><strong>Codebook completo</strong> — categorias, definições,
+exemplos ± e pesos</li>
+<li><strong>Histórico de modificações</strong> — auditoria das
+alterações no codebook</li>
+<li><strong>Configuração da LLM</strong> — provedor, modelo,
+temperatura, k, reasoning</li>
+<li><strong>Resultados</strong> — distribuição por categoria, quartis de
+<code>confidence_score</code>, contagem de casos com confiança &lt;
+0.80</li>
+<li><strong>Confiabilidade inter-codificador</strong> — se
+<code>ac_qual_reliability()</code> foi rodado, tabela completa com IC
+95%</li>
+<li><strong>Referências metodológicas</strong> — Krippendorff,
+Landis-Koch, Gilardi, Wang, Gwet</li>
+<li><strong>Sugestão de citação</strong> — formatada em ABNT (PT) ou APA
+(EN)</li>
+</ol>
+<p>Uso mínimo:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a><span class="co"># Apos ter o resultado da classificacao</span></span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a><span class="fu">ac_qual_report</span>(</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">coded     =</span> resultado,</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>  <span class="at">codebook  =</span> cb_completo,</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a>  <span class="at">chat      =</span> chat,                     <span class="co"># opcional: extrai provedor/modelo</span></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>  <span class="at">author    =</span> <span class="st">&quot;Anderson Henrique&quot;</span>,</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>  <span class="at">path      =</span> <span class="st">&quot;relatorio_metodo.md&quot;</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a>)</span></code></pre></div>
+<p>Uso completo (com IRR e HTML autocontido):</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>irr <span class="ot">&lt;-</span> <span class="fu">ac_qual_reliability</span>(<span class="at">llm =</span> resultado, <span class="at">human =</span> revisado)</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a></span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="fu">ac_qual_report</span>(</span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a>  <span class="at">coded       =</span> resultado,</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a>  <span class="at">codebook    =</span> cb_completo,</span>
+<span id="cb17-6"><a href="#cb17-6" tabindex="-1"></a>  <span class="at">reliability =</span> irr,</span>
+<span id="cb17-7"><a href="#cb17-7" tabindex="-1"></a>  <span class="at">chat        =</span> chat,</span>
+<span id="cb17-8"><a href="#cb17-8" tabindex="-1"></a>  <span class="at">title       =</span> <span class="st">&quot;Codificação do posicionamento parlamentar - 57ª legislatura&quot;</span>,</span>
+<span id="cb17-9"><a href="#cb17-9" tabindex="-1"></a>  <span class="at">author      =</span> <span class="st">&quot;Silva, A.; Souza, B.&quot;</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" tabindex="-1"></a>  <span class="at">method      =</span> <span class="st">&quot;Discursos coletados via API da Câmara (jan-jun/2023, n=847).&quot;</span>,</span>
+<span id="cb17-11"><a href="#cb17-11" tabindex="-1"></a>  <span class="at">format      =</span> <span class="st">&quot;html&quot;</span>,</span>
+<span id="cb17-12"><a href="#cb17-12" tabindex="-1"></a>  <span class="at">path        =</span> <span class="st">&quot;metodo_apendice.html&quot;</span>,</span>
+<span id="cb17-13"><a href="#cb17-13" tabindex="-1"></a>  <span class="at">lang        =</span> <span class="st">&quot;pt&quot;</span>       <span class="co"># ou &quot;en&quot; para submissao internacional</span></span>
+<span id="cb17-14"><a href="#cb17-14" tabindex="-1"></a>)</span></code></pre></div>
+<p>O arquivo gerado é <strong>autocontido</strong> (HTML embute todos os
+estilos; MD é Markdown puro versionável em Git). Pode ser anexado como
+material suplementar do artigo, incluído como apêndice, ou publicado num
+repositório de dados junto com o codebook em YAML
+(<code>ac_qual_save_codebook()</code>) e a saída bruta da LLM.</p>
+<blockquote>
+<p><strong>Nota metodológica.</strong> A prática de publicar codebook +
+rodada da LLM + métricas IRR num único documento é a
+<strong>transparência mínima</strong> para análise assistida por LLM em
+ciências sociais. Sem isso, o leitor tem que confiar no autor — algo que
+a tradição de análise de conteúdo (Krippendorff, 2018) sempre rejeitou.
+O <code>ac_qual_report()</code> empacota essa transparência num único
+comando.</p>
+</blockquote>
+<hr />
+</div>
+<div id="referências" class="section level2">
+<h2>Referências</h2>
+<p>Gilardi, F., Alizadeh, M., &amp; Kubli, M. (2023). ChatGPT
+outperforms crowd workers for text-annotation tasks. <em>PNAS</em>,
+120(30). <a href="https://doi.org/10.1073/pnas.2305016120" class="uri">https://doi.org/10.1073/pnas.2305016120</a></p>
+<p>Gwet, K. L. (2014). <em>Handbook of Inter-Rater Reliability</em> (4th
+ed.). Advanced Analytics.</p>
+<p>Krippendorff, K. (2018). <em>Content Analysis: An Introduction to Its
+Methodology</em> (4th ed.). SAGE.</p>
+<p>Landis, J. R., &amp; Koch, G. G. (1977). The measurement of observer
+agreement for categorical data. <em>Biometrics</em>, 33(1), 159-174.</p>
+<p>Maerz, S., &amp; Benoit, K. (2025). <em>quallmer: Qualitative
+Analysis with Large Language Models in R</em>. GitHub. <a href="https://github.com/quallmer/quallmer" class="uri">https://github.com/quallmer/quallmer</a></p>
+<p>Sampaio, R. C., &amp; Lycarião, D. (2021). <em>Análise de conteúdo
+categorial: manual de aplicação</em>. Brasília: ENAP.</p>
+<p>Wickham, H., et al. (2025). <em>ellmer: Chat with Large Language
+Models</em>. R package. <a href="https://ellmer.tidyverse.org" class="uri">https://ellmer.tidyverse.org</a></p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
