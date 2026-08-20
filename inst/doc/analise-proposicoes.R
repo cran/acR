@@ -107,7 +107,7 @@ knitr::opts_chunk$set(
 
 ## ----codebook-hybrid----------------------------------------------------------
 # chat_obj <- chat_groq(
-#   model = "llama-3.3-70b-versatile",
+#   model = "openai/gpt-oss-120b",
 #   echo  = "none"
 # )
 # 
@@ -173,7 +173,7 @@ knitr::opts_chunk$set(
 
 ## ----classificar--------------------------------------------------------------
 # chat_obj <- chat_groq(
-#   model = "llama-3.3-70b-versatile",
+#   model = "openai/gpt-oss-120b",
 #   echo  = "none"
 # )
 # 

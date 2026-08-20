@@ -69,7 +69,12 @@ Tibble com colunas:
 \itemize{
 \item \code{doc_id}: identificador do documento;
 \item Metadados originais do corpus;
-\item Uma coluna por categoria com a classificação;
+\item \code{categoria}: slug interno da categoria (chave da lista
+\code{categories} no codebook). Em \code{multilabel = TRUE}, string
+pipe-separada sem espaço (\code{"tecnica|politica"}).
+\item \code{categoria_label}: rótulo humano correspondente, vindo do campo
+\code{label} de cada categoria (se ausente, repete o slug). Em
+multilabel, unidos por \code{" | "} (espaço dos dois lados).
 \item \code{confidence_score}: grau de certeza (0-1);
 \item \code{confidence_level}: \code{"alta"}, \code{"media"}, \code{"baixa"};
 \item \code{raciocinio}: justificativa da classificação (se \code{reasoning = TRUE}).
@@ -130,7 +135,7 @@ chat_obj <- ellmer::chat_google_gemini(model = "gemini-2.5-flash", echo = "none"
 coded <- ac_qual_code(corpus, cb, chat = chat_obj)
 
 # Groq (inferencia rapida, plano gratuito)
-chat_groq <- ellmer::chat_groq(model = "llama-3.3-70b-versatile", echo = "none")
+chat_groq <- ellmer::chat_groq(model = "openai/gpt-oss-120b", echo = "none")
 coded <- ac_qual_code(corpus, cb, chat = chat_groq)
 
 # Ollama (modelos locais, sem envio de dados externos)

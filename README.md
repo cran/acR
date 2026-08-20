@@ -55,7 +55,7 @@ sentimento e tabelas resumo direto para o relatório final.
 
 ```r
 # 1. Instalar
-install.packages("acR")           # via CRAN (em análise)
+install.packages("acR")           # via CRAN
 remotes::install_github("andersonheri/acR")  # ou versão dev
 
 # 2. Importar seus documentos (PDF, docx, xlsx, csv, txt, imagens com OCR)
@@ -102,15 +102,16 @@ como pioneira, mas o pacote privilegia abordagens metodologicamente atualizadas.
 A camada de LLM é inspirada no `quallmer` (Maerz e Benoit, 2025) e comunica com
 múltiplos provedores via `ellmer` (Wickham et al., 2025).
 
-> **Status:** `acR` está em desenvolvimento ativo (submissão CRAN em andamento).
-> Contribuições e feedback via [issues](https://github.com/andersonheri/acR/issues).
+> **Status:** `acR` está **na CRAN** desde agosto/2026 e em desenvolvimento
+> ativo no `main`. Contribuições e feedback via
+> [issues](https://github.com/andersonheri/acR/issues).
 
 ---
 
 ## Instalação
 
 ```r
-# Após aprovação na CRAN (submissão em andamento):
+# Via CRAN (estável):
 install.packages("acR")
 
 # Versão de desenvolvimento do GitHub:
@@ -234,7 +235,7 @@ codebook <- ac_qual_codebook(
 
 ```r
 chat_obj <- chat_groq(
-  model = "llama-3.3-70b-versatile",
+  model = "openai/gpt-oss-120b",
   echo  = "none"
 )
 
@@ -276,7 +277,7 @@ que implemente a interface compatível com a API da OpenAI, como instâncias
 privadas ou servidores institucionais.
 
 ```r
-chat_obj <- chat_groq(model = "llama-3.3-70b-versatile", echo = "none")
+chat_obj <- chat_groq(model = "openai/gpt-oss-120b", echo = "none")
 chat_obj <- chat_google_gemini(model = "gemini-2.5-flash", echo = "none")
 chat_obj <- chat_ollama(model = "llama3.2", echo = "none")
 chat_obj <- chat_openai(model = "gpt-4.1", echo = "none")
@@ -396,7 +397,7 @@ referência de todas as funções e changelog.
 ### Referência de funções
 
 - [Índice completo por área](https://ahenriquecp.com/acR/reference/) — Coleta, Corpus, Análise qualitativa (LLM), Análise quantitativa, Validação e confiabilidade, Visualização, Replicabilidade, Exportação.
-- [Notícias / changelog](https://ahenriquecp.com/acR/news/) — histórico de versões (atual: **0.3.2**).
+- [Notícias / changelog](https://ahenriquecp.com/acR/news/) — histórico de versões (atual: **0.3.3**).
 
 ---
 
@@ -408,10 +409,23 @@ citation("acR")
 
 ```
 Henrique, A. (2026). acR: Análise de Conteúdo em R.
-R package version 0.3.2. ORCID: 0000-0002-1842-2725.
+R package version 0.3.3. ORCID: 0000-0002-1842-2725.
 Centro de Estudos da Metrópole (CEM-Cepid) — Universidade de São Paulo.
 https://ahenriquecp.com/acR/
 ```
+
+---
+
+## Uso de Inteligência Artificial
+
+O autor utilizou o modelo de linguagem Claude (Sonnet 5 e Opus 4.8
+da Anthropic), operado por meio do ambiente **Claude Code / Cowork**,
+como ferramenta de apoio à depuração e à estruturação do código do
+pacote `acR` — incluindo a identificação e correção de bugs, a
+refatoração de funções, a escrita de testes automatizados e a redação
+da documentação (vignettes e roxygen). O autor assume integral
+responsabilidade pela correção técnica e científica do material
+publicado.
 
 ---
 

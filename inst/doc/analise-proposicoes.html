@@ -494,7 +494,7 @@ especialmente em categorias limítrofes como <code>populista</code> e
 referências bibliográficas buscadas via LLM, preservando os exemplos
 manuais:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>chat_obj <span class="ot">&lt;-</span> <span class="fu">chat_groq</span>(</span>
-<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">&quot;llama-3.3-70b-versatile&quot;</span>,</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">&quot;openai/gpt-oss-120b&quot;</span>,</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">echo  =</span> <span class="st">&quot;none&quot;</span></span>
 <span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>)</span>
 <span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
@@ -575,10 +575,10 @@ posicionamento:</p>
 <h2>4. Classificação com LLM</h2>
 <p>O argumento <code>chat =</code> recebe qualquer objeto
 <code>Chat</code> do <strong>ellmer</strong>. Aqui usamos o Groq com
-<code>llama-3.3-70b-versatile</code>, que oferece plano gratuito e
-latência baixa — ideal para corpora de tamanho médio como este.</p>
+<code>openai/gpt-oss-120b</code>, que oferece plano gratuito e latência
+baixa — ideal para corpora de tamanho médio como este.</p>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>chat_obj <span class="ot">&lt;-</span> <span class="fu">chat_groq</span>(</span>
-<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">&quot;llama-3.3-70b-versatile&quot;</span>,</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="at">model =</span> <span class="st">&quot;openai/gpt-oss-120b&quot;</span>,</span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="at">echo  =</span> <span class="st">&quot;none&quot;</span></span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>)</span>
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a></span>

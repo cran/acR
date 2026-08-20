@@ -484,7 +484,7 @@ típico brasileiro (500 discursos parlamentares, ~800 tokens cada) com
 </thead>
 <tbody>
 <tr class="odd">
-<td><code>groq/llama-3.3-70b-versatile</code></td>
+<td><code>groq/openai/gpt-oss-120b</code></td>
 <td>US$ 0,50 – 1</td>
 <td>~10 min</td>
 </tr>
@@ -575,31 +575,33 @@ categorias similares.</p>
 <span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>      <span class="at">weight       =</span> <span class="dv">1</span></span>
 <span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>    )</span>
 <span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>  ),</span>
-<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  <span class="at">multilabel =</span> <span class="cn">FALSE</span>,   <span class="co"># cada doc recebe UMA categoria</span></span>
-<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>  <span class="at">lang       =</span> <span class="st">&quot;pt&quot;</span></span>
-<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>)</span>
-<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt; ! Categoria &quot;neutro&quot;: sem exemplos negativos (examples_neg).</span></span>
-<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; ℹ Exemplos negativos reduzem confusão entre categorias similares.</span></span>
-<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a></span>
-<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="fu">print</span>(cb)</span>
-<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt; ── Codebook acR: &quot;tom_discurso&quot; ────────────────────────────────────────────────</span></span>
-<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; • Modo: &quot;manual&quot;</span></span>
-<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; • Categorias (3): &quot;positivo&quot;, &quot;negativo&quot;, and &quot;neutro&quot;</span></span>
-<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt; • Multilabel: FALSE</span></span>
-<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; • Idioma: &quot;pt&quot;</span></span>
-<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; • Criado em: 29/07/2026 12:31</span></span>
-<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt; Instrução geral:</span></span>
-<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; Classifique o tom geral do discurso parlamentar.</span></span>
-<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; Categorias:</span></span>
-<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; • &quot;positivo&quot;: Discurso com tom propositivo e colaborativo.</span></span>
-<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; Ex+: Proponho que trabalhemos juntos nesta agenda.</span></span>
-<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt; • &quot;negativo&quot; [peso: 1.5]: Discurso com tom crítico ou confrontacional.</span></span>
-<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt; Ex+: Esta proposta vai arruinar o país.</span></span>
-<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt; • &quot;neutro&quot;: Discurso descritivo, sem posicionamento claro.</span></span>
-<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt; Ex+: O projeto foi apresentado na sessão de hoje.</span></span></code></pre></div>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a>  <span class="at">multilabel =</span> <span class="cn">FALSE</span>,   <span class="co"># cada doc recebe UMA categoria; se TRUE, a coluna</span></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a>                        <span class="co"># `categoria` na saida vira uma string pipe-separada</span></span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a>                        <span class="co"># (&quot;tecnica|politica&quot;) quando mais de uma se aplicar.</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a>  <span class="at">lang       =</span> <span class="st">&quot;pt&quot;</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a>)</span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt; ! Categoria &quot;neutro&quot;: sem exemplos negativos (examples_neg).</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt; ℹ Exemplos negativos reduzem confusão entre categorias similares.</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="fu">print</span>(cb)</span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; ── Codebook acR: &quot;tom_discurso&quot; ────────────────────────────────────────────────</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt; • Modo: &quot;manual&quot;</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt; • Categorias (3): &quot;positivo&quot;, &quot;negativo&quot;, and &quot;neutro&quot;</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; • Multilabel: FALSE</span></span>
+<span id="cb3-39"><a href="#cb3-39" tabindex="-1"></a><span class="co">#&gt; • Idioma: &quot;pt&quot;</span></span>
+<span id="cb3-40"><a href="#cb3-40" tabindex="-1"></a><span class="co">#&gt; • Criado em: 19/08/2026 16:05</span></span>
+<span id="cb3-41"><a href="#cb3-41" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-42"><a href="#cb3-42" tabindex="-1"></a><span class="co">#&gt; Instrução geral:</span></span>
+<span id="cb3-43"><a href="#cb3-43" tabindex="-1"></a><span class="co">#&gt; Classifique o tom geral do discurso parlamentar.</span></span>
+<span id="cb3-44"><a href="#cb3-44" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb3-45"><a href="#cb3-45" tabindex="-1"></a><span class="co">#&gt; Categorias:</span></span>
+<span id="cb3-46"><a href="#cb3-46" tabindex="-1"></a><span class="co">#&gt; • &quot;positivo&quot;: Discurso com tom propositivo e colaborativo.</span></span>
+<span id="cb3-47"><a href="#cb3-47" tabindex="-1"></a><span class="co">#&gt; Ex+: Proponho que trabalhemos juntos nesta agenda.</span></span>
+<span id="cb3-48"><a href="#cb3-48" tabindex="-1"></a><span class="co">#&gt; • &quot;negativo&quot; [peso: 1.5]: Discurso com tom crítico ou confrontacional.</span></span>
+<span id="cb3-49"><a href="#cb3-49" tabindex="-1"></a><span class="co">#&gt; Ex+: Esta proposta vai arruinar o país.</span></span>
+<span id="cb3-50"><a href="#cb3-50" tabindex="-1"></a><span class="co">#&gt; • &quot;neutro&quot;: Discurso descritivo, sem posicionamento claro.</span></span>
+<span id="cb3-51"><a href="#cb3-51" tabindex="-1"></a><span class="co">#&gt; Ex+: O projeto foi apresentado na sessão de hoje.</span></span></code></pre></div>
 <div id="adicionar-e-remover-categorias" class="section level3">
 <h3>Adicionar e remover categorias</h3>
 <p>Codebooks quase nunca ficam corretos na primeira tentativa. As
@@ -761,6 +763,14 @@ faz a classificação em lotes. Três parâmetros são chave:</p>
 classificado k× (padrão 3) com pequena variação de temperatura, e a
 categoria final é a moda. O <code>confidence_score</code> sai daí — 1.0
 = todas as k rodadas concordaram; 0.67 = 2 de 3.</li>
+<li><code>temperature</code>: <strong>variação estocástica</strong>
+entre as rodadas de self-consistency (padrão <code>0.3</code>). A rodada
+principal usa <code>temperature = 0</code> (determinística); as
+<code>k - 1</code> rodadas de consistência usam este valor para
+diversificar as saídas. Desde a v0.3.3 é de fato repassado ao provedor
+via <code>ellmer::params()</code> — versões anteriores aceitavam o
+parâmetro mas não o aplicavam, inflando <code>confidence_score</code>
+espuriamente.</li>
 <li><code>reasoning</code>: pede raciocínio estruturado em JSON.</li>
 <li><code>live</code>: <strong>visualização em tempo real</strong> da
 classificação, tirando o processo do “caixa-preta”. Ver blockquote

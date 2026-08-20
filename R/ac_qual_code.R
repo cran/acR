@@ -63,7 +63,12 @@
 #' @return Tibble com colunas:
 #'   * `doc_id`: identificador do documento;
 #'   * Metadados originais do corpus;
-#'   * Uma coluna por categoria com a classificação;
+#'   * `categoria`: slug interno da categoria (chave da lista
+#'     `categories` no codebook). Em `multilabel = TRUE`, string
+#'     pipe-separada sem espaço (`"tecnica|politica"`).
+#'   * `categoria_label`: rótulo humano correspondente, vindo do campo
+#'     `label` de cada categoria (se ausente, repete o slug). Em
+#'     multilabel, unidos por `" | "` (espaço dos dois lados).
 #'   * `confidence_score`: grau de certeza (0-1);
 #'   * `confidence_level`: `"alta"`, `"media"`, `"baixa"`;
 #'   * `raciocinio`: justificativa da classificação (se `reasoning = TRUE`).
@@ -103,7 +108,7 @@
 #' coded <- ac_qual_code(corpus, cb, chat = chat_obj)
 #'
 #' # Groq (inferencia rapida, plano gratuito)
-#' chat_groq <- ellmer::chat_groq(model = "llama-3.3-70b-versatile", echo = "none")
+#' chat_groq <- ellmer::chat_groq(model = "openai/gpt-oss-120b", echo = "none")
 #' coded <- ac_qual_code(corpus, cb, chat = chat_groq)
 #'
 #' # Ollama (modelos locais, sem envio de dados externos)
@@ -235,6 +240,7 @@ ac_qual_code <- function(corpus,
     results    = results,
     corpus     = corpus,
     cat_names  = cat_names,
+    codebook   = codebook,
     confidence = confidence,
     reasoning  = reasoning
   )
@@ -273,7 +279,14 @@ ac_qual_code <- function(corpus,
   } else ""
 
   multilabel_instruction <- if (codebook$multilabel) {
-    "Um texto pode pertencer a MAIS DE UMA categoria simultaneamente."
+    paste(
+      "Um texto pode pertencer a MAIS DE UMA categoria simultaneamente.",
+      "Se mais de uma categoria se aplicar, responda com uma UNICA STRING",
+      "contendo os nomes das categorias escolhidas separados por \"|\"",
+      "(exemplo: \"tecnica|politica\"). NUNCA responda com um array JSON",
+      "(ex.: [\"tecnica\", \"politica\"]) -- o campo \"categoria\" deve ser",
+      "SEMPRE uma string, mesmo quando multiplas categorias se aplicam."
+    )
   } else {
     "Cada texto deve ser classificado em EXATAMENTE UMA categoria."
   }
@@ -302,9 +315,46 @@ ac_qual_code <- function(corpus,
                               temperature, reasoning, ...) {
   dots <- list(...)
 
+  # Injeta temperature no objeto `params` do ellmer. Isso e essencial
+  # para self-consistency (Wang et al., 2023) funcionar de fato: sem
+  # variacao real de temperatura entre as k rodadas, `confidence_score`
+  # infla espuriamente. Nao sobrescreve `params` explicitos passados
+  # via `...` (usuario prevalece).
+  if (!is.null(temperature) && requireNamespace("ellmer", quietly = TRUE) &&
+      is.null(dots$params)) {
+    dots$params <- ellmer::params(temperature = temperature)
+  }
+
   if (inherits(model, "Chat")) {
-    chat <- model$clone()
-    chat$set_system_prompt(system_prompt)
+    # Chat pre-configurado pelo usuario: nao ha API publica no ellmer
+    # atual para mutar `params` em runtime. Clonamos e reutilizamos o
+    # provider por meio de um novo chat_<provider>() com params ajustado,
+    # preservando system_prompt. Se algo falhar, degradamos para o
+    # comportamento antigo (clone sem alterar params) e avisamos.
+    chat <- tryCatch({
+      provider <- model$get_provider()
+      provider_name <- tolower(class(provider)[1])
+      # class names: ProviderAnthropic, ProviderOpenAI, ProviderGoogleGemini...
+      provider_name <- sub("^provider", "", provider_name)
+      # Modelo atual do chat (get_model devolve string)
+      current_model <- tryCatch(model$get_model(), error = function(e) NULL)
+      if (!is.null(current_model) && !is.null(dots$params)) {
+        # Reconstroi via .ac_ellmer_chat para respeitar aliases
+        new_name <- paste0(provider_name, "/", current_model)
+        new_chat <- do.call(.ac_ellmer_chat,
+                            c(list(name = new_name, system_prompt = system_prompt),
+                              dots))
+        new_chat
+      } else {
+        c2 <- model$clone()
+        c2$set_system_prompt(system_prompt)
+        c2
+      }
+    }, error = function(e) {
+      c2 <- model$clone()
+      c2$set_system_prompt(system_prompt)
+      c2
+    })
   } else {
     chat_args <- c(
       list(name = model, system_prompt = system_prompt),
@@ -384,18 +434,47 @@ ac_qual_code <- function(corpus,
 
 #' @keywords internal
 #' @noRd
-.ac_build_result_tibble <- function(results, corpus, cat_names,
+.ac_build_result_tibble <- function(results, corpus, cat_names, codebook,
                                      confidence, reasoning) {
+  # Mapeamento slug -> label para categoria_label. Se nenhuma categoria
+  # tiver `label` definido, categoria_label repete o slug (sem quebrar
+  # nada). Bug 5: garante coluna legivel na saida sem exigir dicionario
+  # externo do usuario.
+  label_map <- stats::setNames(
+    vapply(cat_names, function(k) {
+      cat <- codebook$categories[[k]]
+      if (!is.null(cat$label) && nzchar(cat$label)) cat$label else k
+    }, character(1)),
+    cat_names
+  )
+
   rows <- purrr::map(results, function(r) {
     main <- r$main
     conf <- r$conf_scores
 
+    # Modelos podem devolver `categoria` como string ("a"), string
+    # pipe-separada ("a|b") ou array JSON (["a","b"]) apesar do prompt.
+    # Sempre colapsamos para uma unica string, mantendo o tibble com uma
+    # linha por documento -- essa e a garantia esperada pelo restante do
+    # pipeline (ac_qual_reliability, ac_qual_report, etc.).
     cat_val <- if (!is.null(main) && !is.null(main$categoria)) {
-      as.character(main$categoria)
+      paste(as.character(main$categoria), collapse = "|")
     } else NA_character_
 
+    # Traduz slug(s) -> label(s), unindo multilabel com " | " (espaco
+    # dos dois lados) para leitura humana. Slugs desconhecidos passam
+    # inalterados.
+    cat_label <- if (!is.na(cat_val)) {
+      slugs <- strsplit(cat_val, "|", fixed = TRUE)[[1]]
+      labels <- vapply(slugs, function(s) {
+        if (s %in% names(label_map)) label_map[[s]] else s
+      }, character(1))
+      paste(labels, collapse = " | ")
+    } else NA_character_
+
+    # Mesmo cuidado para raciocinio: alguns modelos devolvem lista/array
     rac_val <- if (reasoning && !is.null(main) && !is.null(main$raciocinio)) {
-      as.character(main$raciocinio)
+      paste(as.character(main$raciocinio), collapse = " ")
     } else NA_character_
 
     conf_score <- if (!is.null(conf)) conf$total %||% NA_real_ else NA_real_
@@ -406,6 +485,7 @@ ac_qual_code <- function(corpus,
     row <- tibble::tibble(
       doc_id           = r$doc_id,
       categoria        = cat_val,
+      categoria_label  = cat_label,
       confidence_score = conf_score,
       confidence_level = conf_level
     )

@@ -1,3 +1,95 @@
+# acR 0.3.3
+
+## Compatibilidade
+
+* Teste `ac_plot_top_terms() gera ggplot valido` (em
+  `test-plots-snapshot.R:56`) usava `"labels" %in% names(p)` como
+  sanidade. Em ggplot2 4.x a estrutura interna do objeto ggplot mudou
+  (nova base S7) e a checagem por nome de slot passou a retornar
+  `FALSE`, quebrando o test na CRAN r-release-macos e r-oldrel-macos
+  (post-acceptance check, deadline 2026-08-21). Substituido por
+  `expect_no_error(ggplot2::ggplot_build(p))` -- teste de
+  buildabilidade real, independente de versao do ggplot2.
+
+* Referencias ao modelo Groq `llama-3.3-70b-versatile` (e ao par
+  `llama-3.1-8b-instant`) foram atualizadas para `openai/gpt-oss-120b`
+  (e `openai/gpt-oss-20b`) em exemplos, vignettes, README, testes de
+  integracao e na tabela de `ac_qual_recommend_model()`. A Groq
+  descontinuou os modelos Llama em 2026-06-17; chamadas com o nome
+  antigo retornam HTTP 404. Nao afeta usuarios da CRAN diretamente
+  (sao apenas defaults sugeridos e testes com `skip_if()` de API key),
+  mas evita quebra de exemplos e de CI com `GROQ_API_KEY` configurada.
+
+## Nova funcionalidade
+
+* **`ac_qual_report_full()`** (novo) -- relatorio consolidado
+  multi-variavel. Aceita uma lista nomeada de resultados
+  (`coded` + `codebook` + `reliability` opcional) e gera **um unico**
+  arquivo (Markdown ou HTML) com uma secao por variavel, tabela sumaria
+  no topo (k categorias, n docs, multilabel por variavel), mesmo idioma
+  (`pt`/`en`) e formato consistente com [ac_qual_report()]. Atende ao
+  caso de uso comum de analise de conteudo com N variaveis, que antes
+  exigia consolidador ad hoc.
+
+* **Campo `label` opcional em cada categoria do codebook.** Cada entrada
+  de `categories` em [ac_qual_codebook()] agora aceita `label = "..."`
+  como rotulo humano para exibicao (paralelo a `definition`,
+  `examples_pos`, etc.). Se ausente, o rotulo defaults para o proprio
+  slug (chave da lista). A saida de [ac_qual_code()] ganha coluna nova
+  **`categoria_label`** com o rotulo traduzido; em multilabel, os labels
+  vem unidos por `" | "` (espaco dos dois lados), enquanto a coluna
+  `categoria` mantem `"|"` sem espaco como chave estavel de comparacao.
+  Preservado tambem em `ac_qual_save_codebook()` / `ac_qual_load_codebook()`
+  (YAML).
+
+## Bug fixes -- modulo qualitativo (pipeline LLM)
+
+Tres bugs encontrados no `ac_qual_code()` e funcoes internas durante uso
+em producao (Gemini/Groq/OpenAI) foram corrigidos:
+
+* **`live = "terminal"` travava no primeiro documento com "Cannot find
+  progress bar"** (`R/ac_qual_live.R`). A `cli::cli_progress_bar()` era
+  criada sem `.envir`, amarrando o ciclo de vida da barra ao frame de
+  `.ac_live_start()` -- que retorna imediatamente. `cli` destruia a
+  barra antes de `ac_qual_code()` conseguir chamar
+  `cli_progress_update()`. Fix: `.ac_live_start()` (e `.ac_live_finish()`)
+  agora aceita argumento `.envir` (padrao `parent.frame()`), amarrando
+  a barra ao frame do chamador -- tipicamente `ac_qual_code()`.
+
+* **`temperature` de `ac_qual_code()` era aceito mas nunca usado**
+  (`R/ac_qual_code.R`, `.ac_classify_one()`). O parametro formal era
+  ignorado no corpo, entao as `k_consistency` rodadas de
+  self-consistency (Wang et al., 2023) usavam sempre a temperatura
+  padrao do provedor -- variacao estocastica esperada nao acontecia,
+  inflando `confidence_score` espuriamente. Fix: `temperature` agora
+  e injetada via `ellmer::params(temperature = ...)` no argumento
+  `params` do chat (respeita `params` explicitos passados pelo usuario
+  via `...`). Para o caminho `chat = <Chat pre-configurado>`, o Chat e
+  reconstruido com o novo `params` via `get_provider()` + `get_model()`,
+  com fallback graceful para o clone antigo se a reconstrucao falhar.
+
+* **`ac_qual_report(path = <relativo>)` falhava com "The directory 'X'
+  does not exist"** mesmo com a pasta criada, e derrubava loops sem
+  `tryCatch`. Causa: `rmarkdown::render()` muda o cwd durante o knit,
+  e `normalizePath(path, mustWork = FALSE)` nao converte confiavelmente
+  paths relativos inexistentes em absolutos. Fix: `.ac_report_absolute_path()`
+  resolve para absoluto contra o cwd atual antes de qualquer `render()`,
+  e a pasta destino e criada com `dir.create(recursive = TRUE)` se
+  necessario.
+
+* **`multilabel = TRUE` quebrava com "Result must be length 1, not N"
+  quando o modelo devolvia array JSON** (`R/ac_qual_code.R`,
+  `.ac_build_system_prompt()` + `.ac_build_result_tibble()`). O prompt
+  nao instruia explicitamente que `"categoria"` deve ser sempre uma
+  string (mesmo em multilabel), e o parser assumia que
+  `main$categoria` era escalar. Um documento com array `["a","b"]`
+  quebrava a `purrr::map()` inteira, derrubando a classificacao de
+  TODOS os documentos daquela variavel. Fix: (a) prompt multilabel
+  agora instrui a devolver "tecnica|politica" (string pipe-separada) e
+  proibe explicitamente array JSON; (b) parser defensivo faz sempre
+  `paste(as.character(main$categoria), collapse = "|")`, absorvendo
+  arrays quando o modelo ignora a instrucao.
+
 # acR 0.3.2
 
 ## Novidades

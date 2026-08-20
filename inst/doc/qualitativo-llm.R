@@ -40,7 +40,9 @@ cb <- ac_qual_codebook(
       weight       = 1
     )
   ),
-  multilabel = FALSE,   # cada doc recebe UMA categoria
+  multilabel = FALSE,   # cada doc recebe UMA categoria; se TRUE, a coluna
+                        # `categoria` na saida vira uma string pipe-separada
+                        # ("tecnica|politica") quando mais de uma se aplicar.
   lang       = "pt"
 )
 
