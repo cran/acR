@@ -1,7 +1,7 @@
-e7efb93911970baef52f1b35652776d1 *DESCRIPTION
+7286bd99972cbc7e5265c1e2e5d71f9b *DESCRIPTION
 ef8dcfe068115c58fb48676c203cb63c *LICENSE
 9431847fd52663e4dc3d95c17c80ecce *NAMESPACE
-c459633000f2c3ba722ddf4d4650876d *NEWS.md
+7a122cb2ca5f9db6ad6ebc68bd731a00 *NEWS.md
 2157210382b215f76c9e43dc22367743 *R/acR-package.R
 17bd170745f226bba4598d87b238e568 *R/ac_clean.R
 3a66c5c2c09dd2708f6cc9b1fe69c994 *R/ac_cluster.R
@@ -21,7 +21,7 @@ c15448d68b32ec943d40dc23c0c02617 *R/ac_plot_cooccurrence.R
 e09ae928b7afd3e2ace415df2bb1fb58 *R/ac_plot_tf_idf.R
 c5b6f7e38e13026e42237ae04835aae4 *R/ac_plot_top_terms.R
 4530e9850c074fef167b50116b714740 *R/ac_plot_wordcloud_comparative.R
-8d0c6eb8880e6442137b8be48792bc82 *R/ac_qual_code.R
+6986545b6484027f6fb518f2a83d2fa4 *R/ac_qual_code.R
 c2ecd25f0cc5ef03ceaae812b9f8ea4b *R/ac_qual_codebook.R
 3eb21bbe476c2b85c9817d07a5b1bcb1 *R/ac_qual_irr.R
 2769116f8dfb86f98aa550d95f6bb039 *R/ac_qual_live.R
@@ -58,7 +58,7 @@ eae2308f936333abb3c56203f7f15f4a *inst/doc/lda.Rmd
 2d9530f9ea01662509da8ee82d419c16 *inst/doc/lda.html
 de614b6654113e5bf238e31d7553117f *inst/doc/qualitativo-llm.R
 4f97b0198706807f729b725c266ca4f0 *inst/doc/qualitativo-llm.Rmd
-2fd39c3c2f7674d158709445e7282ac4 *inst/doc/qualitativo-llm.html
+a734a097f1de293978fb3a8bc3eb38e2 *inst/doc/qualitativo-llm.html
 d474018883351fff678dca67b0a31279 *inst/doc/quantitativo.R
 b7006efe12253ed8a38793839a885697 *inst/doc/quantitativo.Rmd
 9980ff275b5b539715f0bd5d90bf83b3 *inst/doc/quantitativo.html
@@ -67,7 +67,7 @@ b7006efe12253ed8a38793839a885697 *inst/doc/quantitativo.Rmd
 f7ef5c524edddbb66495f1b0a5dfd1da *inst/doc/quickstart.html
 c658d4e6cfd01010062ed120ff0a16bb *inst/doc/replicabilidade.R
 cd90c648a0c96309f11a46c7ae89d725 *inst/doc/replicabilidade.Rmd
-bf34183c7157fbcb5b41903311193fe0 *inst/doc/replicabilidade.html
+9bbd003795a6ff17033d4583ffbb7cca *inst/doc/replicabilidade.html
 da1a443ee19884e07893968113fd834b *inst/doc/sentimento.R
 183f10638df37b7ebc91254545a928db *inst/doc/sentimento.Rmd
 5479e6480181af50ec59e100839c1df6 *inst/doc/sentimento.html
@@ -151,7 +151,7 @@ b1286d166673bf11a7f442e50aa6cf29 *tests/testthat/test-ac_plot_tf_idf.R
 75cd4573912cfe3d6700748daf23227b *tests/testthat/test-ac_plot_top_terms.R
 5750e5eb5d7473f0be25eaecc350f0e0 *tests/testthat/test-ac_plot_wordcloud_comparative.R
 a6bdd30479e7593ea36048034b9ada55 *tests/testthat/test-ac_qual_code-live.R
-3f3a928b46956ed0d7d49c7bd45fc718 *tests/testthat/test-ac_qual_code.R
+9c1ea2a067ee2d5b5ea6d5b9f4f36c9b *tests/testthat/test-ac_qual_code.R
 cf6733be1b1072e46d9ba2ed4c185fd1 *tests/testthat/test-ac_qual_codebook.R
 5c5d756b4f01c36afaf19a3cd014b2bb *tests/testthat/test-ac_qual_irr.R
 204942f13a8020359577ee87cf65d0cf *tests/testthat/test-ac_qual_irr_export.R

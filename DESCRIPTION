@@ -2,7 +2,7 @@ Type: Package
 Package: acR
 Title: Content Analysis in R: Integrated Qualitative (LLMs) and
         Quantitative Pipeline
-Version: 0.3.3
+Version: 0.3.4
 Authors@R: person("Anderson Henrique", email = "anderson.henrique@usp.br",
     role = c("aut", "cre"),
     comment = c(ORCID = "0000-0002-1842-2725"))
@@ -34,9 +34,9 @@ Encoding: UTF-8
 Language: en-US
 RoxygenNote: 7.3.2
 NeedsCompilation: no
-Packaged: 2026-08-19 19:05:28 UTC; anderson_henrique
+Packaged: 2026-09-10 01:45:41 UTC; anderson_henrique
 Author: Anderson Henrique [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-1842-2725>)
 Maintainer: Anderson Henrique <anderson.henrique@usp.br>
 Repository: CRAN
-Date/Publication: 2026-08-20 08:42:18 UTC
+Date/Publication: 2026-09-10 03:50:02 UTC
