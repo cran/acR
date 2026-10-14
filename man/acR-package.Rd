@@ -51,5 +51,10 @@ Useful links:
 \author{
 \strong{Maintainer}: Anderson Henrique \email{anderson.henrique@usp.br} (\href{https://orcid.org/0000-0002-1842-2725}{ORCID})
 
+Authors:
+\itemize{
+  \item Anderson Henrique \email{anderson.henrique@usp.br} (\href{https://orcid.org/0000-0002-1842-2725}{ORCID})
+}
+
 }
 \keyword{internal}

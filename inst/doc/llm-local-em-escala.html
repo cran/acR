@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Classificação com LLM Local em Escala</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Classificação com LLM Local em Escala</h1>
+
+
+<div id="TOC">
+<ul>
+<li><a href="#vis%C3%A3o-geral" id="toc-visão-geral">Visão
+geral</a></li>
+<li><a href="#conectando-a-um-servidor-local" id="toc-conectando-a-um-servidor-local">1. Conectando a um servidor
+local</a></li>
+<li><a href="#dimensionando-o-contexto-antes-de-gastar-uma-chamada" id="toc-dimensionando-o-contexto-antes-de-gastar-uma-chamada">2.
+Dimensionando o contexto antes de gastar uma chamada</a></li>
+<li><a href="#rodando-em-lotes-com-checkpoint" id="toc-rodando-em-lotes-com-checkpoint">3. Rodando em lotes com
+checkpoint</a></li>
+<li><a href="#lidando-com-falhas-t%C3%A9cnicas" id="toc-lidando-com-falhas-técnicas">4. Lidando com falhas
+técnicas</a></li>
+<li><a href="#valida%C3%A7%C3%A3o-humana-por-categoria-multilabel" id="toc-validação-humana-por-categoria-multilabel">5. Validação humana
+por categoria (multilabel)</a></li>
+<li><a href="#auditando-a-configura%C3%A7%C3%A3o-da-execu%C3%A7%C3%A3o" id="toc-auditando-a-configuração-da-execução">6. Auditando a
+configuração da execução</a></li>
+<li><a href="#refer%C3%AAncias" id="toc-referências">Referências</a></li>
+</ul>
+</div>
+
+<div id="visão-geral" class="section level2">
+<h2>Visão geral</h2>
+<p>Esta vignette cobre o fluxo de <code>ac_qual_code()</code> quando o
+modelo roda <strong>localmente</strong> (LM Studio, llama.cpp, vLLM,
+Ollama em modo OpenAI) em vez de um provedor em nuvem — o cenário mais
+comum quando os documentos não podem sair do ambiente do pesquisador
+(dados sensíveis, acordos de confidencialidade institucional) ou quando
+o volume de documentos tornaria o custo por token de um provedor pago
+proibitivo. A orientação aqui vem de uso em produção classificando atos
+normativos administrativos, com documentos de até 1,4 milhão de
+caracteres e rodadas de milhares de documentos.</p>
+<p>Classificar localmente troca custo monetário e risco de vazamento de
+dados por gerência própria de infraestrutura: tamanho de contexto,
+throughput e estabilidade do servidor passam a ser problema do
+pesquisador, não do provedor. As seções abaixo cobrem exatamente os
+pontos onde isso dá errado na prática.</p>
+</div>
+<div id="conectando-a-um-servidor-local" class="section level2">
+<h2>1. Conectando a um servidor local</h2>
+<p>[ac_chat_local()] cria um <code>Chat</code> do <code>ellmer</code>
+apontando para qualquer servidor compatível com a API da OpenAI, sem
+exigir uma chave de API real:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(acR)</span>
+<span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a><span class="co"># LM Studio, servindo um modelo na porta padrao (1234)</span></span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>chat_local <span class="ot">&lt;-</span> <span class="fu">ac_chat_local</span>(<span class="at">model =</span> <span class="st">&quot;qwen2.5-14b-instruct&quot;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a><span class="co"># llama.cpp (llama-server), porta customizada</span></span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>chat_llama <span class="ot">&lt;-</span> <span class="fu">ac_chat_local</span>(</span>
+<span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>  <span class="at">model    =</span> <span class="st">&quot;modelo-local&quot;</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>  <span class="at">base_url =</span> <span class="st">&quot;http://localhost:8080/v1&quot;</span></span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>)</span></code></pre></div>
+<p>Use <code>chat = chat_local</code> em [ac_qual_code()] exatamente
+como usaria qualquer outro <code>Chat</code> do <code>ellmer</code>:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>coded <span class="ot">&lt;-</span> <span class="fu">ac_qual_code</span>(corpus, codebook, <span class="at">chat =</span> chat_local)</span></code></pre></div>
+</div>
+<div id="dimensionando-o-contexto-antes-de-gastar-uma-chamada" class="section level2">
+<h2>2. Dimensionando o contexto antes de gastar uma chamada</h2>
+<p>Servidores locais costumam ter janelas de contexto menores que
+provedores em nuvem (4k–32k tokens é comum, contra 128k+ de modelos de
+ponta). Antes de rodar um corpus inteiro, estime quantos tokens cada
+documento vai consumir:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>tamanhos <span class="ot">&lt;-</span> <span class="fu">ac_estimate_tokens</span>(corpus<span class="sc">$</span>text)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">summary</span>(tamanhos)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Quantos documentos provavelmente excedem uma janela de 8k tokens?</span></span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">sum</span>(tamanhos <span class="sc">&gt;</span> <span class="dv">8000</span>)</span></code></pre></div>
+<p><code>ac_estimate_tokens()</code> é uma heurística (caracteres por
+token) — não faz nenhuma chamada de rede. Para uma estimativa calibrada
+contra o modelo e tokenizador real, rode
+<code>ac_calibrate_tokens()</code> numa amostra pequena antes da rodada
+completa:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>chat_factory <span class="ot">&lt;-</span> <span class="cf">function</span>(temperature, system_prompt) {</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">ac_chat_local</span>(<span class="at">model =</span> <span class="st">&quot;qwen2.5-14b-instruct&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>               <span class="at">temperature =</span> temperature, <span class="at">system_prompt =</span> system_prompt)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>}</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>razao <span class="ot">&lt;-</span> <span class="fu">ac_calibrate_tokens</span>(chat_factory, <span class="fu">sample</span>(corpus<span class="sc">$</span>text, <span class="dv">10</span>))</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>tamanhos_calibrados <span class="ot">&lt;-</span> <span class="fu">ac_estimate_tokens</span>(corpus<span class="sc">$</span>text, <span class="at">chars_per_token =</span> razao)</span></code></pre></div>
+<p>Documentos que excedem a janela de contexto do servidor não devem ser
+enviados como estão — considere dividir manualmente em partes menores
+antes de montar o <code>ac_corpus()</code>, ou reduzir
+<code>reasoning_length</code> para liberar espaço para a resposta.</p>
+</div>
+<div id="rodando-em-lotes-com-checkpoint" class="section level2">
+<h2>3. Rodando em lotes com checkpoint</h2>
+<p>Uma rodada de milhares de documentos contra um servidor local pode
+levar horas, e qualquer interrupção (queda de energia, servidor
+reiniciado, notebook suspenso) sem checkpoint significa reclassificar
+tudo. Use <code>checkpoint_dir</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>coded <span class="ot">&lt;-</span> <span class="fu">ac_qual_code</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  corpus, codebook,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">chat           =</span> chat_local,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">checkpoint_dir =</span> <span class="st">&quot;checkpoints/rodada_2026_10&quot;</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>  <span class="at">max_retries    =</span> <span class="dv">2</span><span class="dt">L</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a>  <span class="at">live           =</span> <span class="st">&quot;progress&quot;</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>)</span></code></pre></div>
+<p>Cada documento é salvo (gravação atômica) assim que classificado. Se
+a rodada for interrompida, rodar o mesmo comando de novo pula os
+documentos já concluídos e continua de onde parou.
+<code>live = &quot;progress&quot;</code> mostra uma barra enxuta (documento atual
++ status) em vez de ecoar categoria e raciocínio a cada uma das
+<code>k_consistency</code> rodadas — importante para não poluir o
+console numa rodada de milhares de documentos.</p>
+<p>Se os parâmetros da rodada mudarem (codebook revisado, modelo
+diferente, <code>k_consistency</code> diferente), o
+<code>checkpoint_dir</code> é invalidado e recomeça do zero
+automaticamente — com aviso — para nunca misturar classificações de
+codebooks diferentes sem que o pesquisador perceba.</p>
+</div>
+<div id="lidando-com-falhas-técnicas" class="section level2">
+<h2>4. Lidando com falhas técnicas</h2>
+<p>Servidores locais sob carga sustentada falham de formas que
+provedores em nuvem bem estabelecidos raramente mostram: timeout por
+sobrecarga de memória, resposta truncada, conexão recusada depois de
+muitas horas rodando. A coluna <code>status</code> do resultado
+diferencia os tipos de falha:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">table</span>(coded<span class="sc">$</span>status)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co"># ok                 -- classificado normalmente</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># resposta_invalida  -- o servidor respondeu, mas nao em JSON valido</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># estouro_contexto   -- documento excedeu a janela de contexto</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co"># timeout            -- servidor nao respondeu a tempo</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co"># erro_servidor      -- outro erro de rede/servidor</span></span></code></pre></div>
+<p><code>max_retries</code> tenta de novo (com espera exponencial) para
+<code>timeout</code> e <code>erro_servidor</code>, mas não para
+<code>estouro_contexto</code> — repetir a mesma chamada com o mesmo
+texto não vai resolver um documento que simplesmente não cabe na janela
+do modelo. Se mais da metade dos últimos documentos falhar, a rodada é
+interrompida automaticamente — sinal de que o servidor está instável e
+insistir só desperdiçaria tempo.</p>
+</div>
+<div id="validação-humana-por-categoria-multilabel" class="section level2">
+<h2>5. Validação humana por categoria (multilabel)</h2>
+<p>Quando o codebook é <code>multilabel = TRUE</code>, a métrica
+agregada de [ac_qual_reliability()] mistura decisões binárias
+independentes num único número — uma concordância “boa” pode esconder
+uma categoria específica indo mal. Use
+<code>by_variable = TRUE</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>rel <span class="ot">&lt;-</span> <span class="fu">ac_qual_reliability</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">llm    =</span> coded,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">human  =</span> humano_df,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">by_variable    =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>  <span class="at">exclude_status =</span> <span class="fu">c</span>(<span class="st">&quot;estouro_contexto&quot;</span>, <span class="st">&quot;timeout&quot;</span>, <span class="st">&quot;erro_servidor&quot;</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>)</span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">attr</span>(rel, <span class="st">&quot;by_variable&quot;</span>)</span></code></pre></div>
+<p><code>exclude_status</code> remove da comparação documentos cuja
+rodada principal falhou — uma categoria vinda de uma resposta inválida
+ou um timeout não é um dado confiável sobre concordância, e misturá-la
+nas métricas por variável distorceria o diagnóstico.</p>
+<p>Para montar a amostra de validação humana de forma representativa da
+população (não só de cada categoria igualmente, como
+<code>strategy = &quot;stratified&quot;</code> faz), use
+<code>strategy = &quot;proportional&quot;</code>:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>amostra <span class="ot">&lt;-</span> <span class="fu">ac_qual_sample</span>(</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a>  coded, <span class="at">n =</span> <span class="dv">100</span>,</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a>  <span class="at">strategy =</span> <span class="st">&quot;proportional&quot;</span>, <span class="at">strata =</span> <span class="st">&quot;especie_normativa&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a>)</span></code></pre></div>
+<p>A amostra ganha <code>peso_amostral</code>, útil se você for agregar
+a validação numa estimativa populacional ponderada.</p>
+</div>
+<div id="auditando-a-configuração-da-execução" class="section level2">
+<h2>6. Auditando a configuração da execução</h2>
+<p>Toda chamada de [ac_qual_code()] anexa um atributo
+<code>run_info</code> ao resultado, com a configuração efetiva da
+rodada:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>info <span class="ot">&lt;-</span> <span class="fu">attr</span>(coded, <span class="st">&quot;run_info&quot;</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>info<span class="sc">$</span>model</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>info<span class="sc">$</span>params_efetivos<span class="sc">$</span>temperature   <span class="co"># a temperatura que o PROVEDOR confirmou</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>info<span class="sc">$</span>temperatura_pedida            <span class="co"># a temperatura que voce PEDIU</span></span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>info<span class="sc">$</span>codebook_hash</span></code></pre></div>
+<p>Compare <code>params_efetivos$temperature</code> com
+<code>temperatura_pedida</code> antes de reportar
+<code>confidence_score</code> num artigo: se um <code>Chat</code>
+pré-configurado não confirmar a temperatura pedida,
+<code>ac_qual_code()</code> já emite um aviso explícito no momento da
+rodada — mas <code>run_info</code> permite auditar isso depois,
+inclusive em rodadas de terceiros.</p>
+</div>
+<div id="referências" class="section level2">
+<h2>Referências</h2>
+<p>Wang, X. et al. (2023). Self-Consistency Improves Chain of Thought
+Reasoning in Language Models. <em>EMNLP</em>.</p>
+<p>Gilardi, F.; Alizadeh, M.; Kubli, M. (2023). ChatGPT Outperforms
+Crowd Workers for Text-Annotation Tasks. <em>PNAS</em>, 120(30).</p>
+<p>Gwet, K. L. (2014). <em>Handbook of Inter-Rater Reliability</em> (4th
+ed.). Advanced Analytics.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

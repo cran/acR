@@ -55,7 +55,7 @@ academica (tabelas em artigos) ou o compartilhamento de dados replicaveis.
 \details{
 \subsection{CSV}{
 
-Usa \code{\link[utils:write.table]{utils::write.csv()}} com \code{row.names = FALSE} e encoding UTF-8.
+Usa \code{\link[utils:write.csv]{utils::write.csv()}} com \code{row.names = FALSE} e encoding UTF-8.
 Separador: virgula. Adequado para importacao em Stata, SPSS, Python e R.
 }
 
@@ -75,7 +75,7 @@ LibreOffice Calc.
 
 \subsection{RDS}{
 
-Serializa o objeto R completo via \code{\link[base:readRDS]{base::saveRDS()}}. Preserva tipos,
+Serializa o objeto R completo via \code{\link[base:saveRDS]{base::saveRDS()}}. Preserva tipos,
 atributos e classes (incluindo objetos \code{ac_irr}, corpus etc.).
 Ideal para replicabilidade interna ao projeto.
 }
