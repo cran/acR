@@ -5,11 +5,11 @@
 [![R-CMD-check](https://github.com/andersonheri/acR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/andersonheri/acR/actions/workflows/R-CMD-check.yaml)
 [![pkgdown](https://github.com/andersonheri/acR/actions/workflows/pkgdown.yaml/badge.svg)](https://ahenriquecp.com/acR/)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/license/MIT)
 [![Codecov](https://codecov.io/gh/andersonheri/acR/branch/main/graph/badge.svg)](https://app.codecov.io/gh/andersonheri/acR)
 <!-- badges: end -->
 
-> **Análise de Conteúdo em R** — pipeline integrado qualitativo (LLMs) e
+> **Análise de Conteúdo em R**: pipeline integrado qualitativo (LLMs) e
 > quantitativo, com foco em corpora brasileiros e dados parlamentares.
 
 <p align="center">
@@ -18,8 +18,35 @@
 
 ## Em uma linha
 
-Do texto bruto ao resultado publicável — codebook, LLM, *keyness*, LDA, sentimento
+Do texto bruto ao resultado publicável: codebook, LLM, *keyness*, LDA, sentimento
 e concordância inter-codificador, num único fluxo reprodutível.
+
+## Novidades
+
+Última leva traz 12 técnicas novas de diagnóstico, escalonamento e
+dicionários para o módulo quantitativo. Veja a seção
+["Novidades: diagnóstico de corpus, escalas e
+dicionários"](https://ahenriquecp.com/acR/articles/quantitativo.html) da
+vignette quantitativa para exemplos completos:
+
+* **Diagnóstico de corpus**: legibilidade (`ac_readability()`, Flesch
+  adaptado ao português), diversidade lexical (`ac_lexical_diversity()`:
+  TTR, Herdan's C, MTLD) e Lei de Zipf (`ac_plot_zipf()`).
+* **Leitura de contexto**: concordância/KWIC (`ac_kwic()`) e colocações
+  com medidas de associação (PMI, log-likelihood, qui-quadrado)
+  (`ac_collocations()`).
+* **Série temporal**: agregação diacrônica de qualquer métrica por dia,
+  semana, mês ou ano (`ac_temporal()`).
+* **Escalas e mapas**: escalonamento ideológico via Wordscores
+  (`ac_wordscores()`) e análise de correspondência, biplot de
+  documentos/grupos × termos (`ac_ca()`).
+* **Dicionários customizados**: dicionário multi-categoria genérico
+  (`ac_dictionary()`), léxicos de emoção (`ac_emotion()`), construção e
+  importação de dicionários via YAML/CSV (`ac_build_dictionary()`,
+  `ac_dictionary_save()`/`ac_dictionary_load()`,
+  `ac_dictionary_import()`) e validação contra codificação humana
+  (`ac_dictionary_validate()`): o mesmo rigor de `ac_qual_reliability()`,
+  agora para o método de dicionário.
 
 ## Para quem é
 
@@ -88,16 +115,20 @@ humana, e a concordância inter-codificador (percent agreement, Cohen's/Fleiss'
 **Módulo quantitativo.** Ferramentas estatísticas clássicas de análise de conteúdo:
 frequência de termos e por grupo, TF-IDF, *keyness* (χ²/*log-likelihood*), redes
 de co-ocorrência com PMI, análise de sentimento em português (OpLexicon), modelagem
-de tópicos com LDA e seleção automática de *k*. Visualizações prontas para
-publicação em `ggplot2`, compatíveis com `ipeaplot`.
+de tópicos com LDA e seleção automática de *k*. Inclui também diagnóstico de corpus
+(legibilidade, diversidade lexical, Lei de Zipf), concordância/colocações (KWIC,
+PMI/log-likelihood), séries temporais, escalonamento ideológico (Wordscores),
+análise de correspondência e dicionários multi-categoria customizáveis (incluindo
+léxicos de emoção, com validação contra codificação humana). Visualizações
+prontas para publicação em `ggplot2`, compatíveis com `ipeaplot`.
 
 **Coleta nativa** de discursos da Câmara dos Deputados (por período, partido, UF)
 e do Senado Federal (via `senatebR`).
 
 ## Fundamentação metodológica
 
-O pipeline segue Sampaio e Lycarião (2021) — referência atual para análise de
-conteúdo categorial no Brasil — e Krippendorff (2018). Bardin (2011) é reconhecida
+O pipeline segue Sampaio e Lycarião (2021), referência atual para análise de
+conteúdo categorial no Brasil, e Krippendorff (2018). Bardin (2011) é reconhecida
 como pioneira, mas o pacote privilegia abordagens metodologicamente atualizadas.
 A camada de LLM é inspirada no `quallmer` (Maerz e Benoit, 2025) e comunica com
 múltiplos provedores via `ellmer` (Wickham et al., 2025).
@@ -126,7 +157,7 @@ install.packages("ellmer")
 
 ## Pipeline qualitativo: do texto à classificação
 
-### Passo 1 — Coletar discursos parlamentares
+### Passo 1: Coletar discursos parlamentares
 
 O `acR` tem funções nativas para coletar dados das APIs abertas da Câmara
 dos Deputados e do Senado Federal. A coleta da Câmara é feita por período,
@@ -141,16 +172,16 @@ library(acR)
 library(ellmer)
 library(dplyr)
 
-# Coletar discursos plenários da Câmara — março de 2024
+# Coletar discursos plenários da Câmara em março de 2024
 corpus_raw <- ac_fetch_camara(
   data_inicio   = "2024-03-11",
   data_fim      = "2024-03-15",
-  tipo_discurso = "plenario",
+  tipo_discurso = "plenário",
   n_max         = 30L
 )
 ```
 
-### Passo 2 — Estruturar e limpar o corpus
+### Passo 2: Estruturar e limpar o corpus
 
 O objeto `ac_corpus` é a unidade central do pacote, carregando o texto,
 os metadados e o idioma do corpus, aceito por todas as funções de análise.
@@ -183,7 +214,7 @@ corpus_limpo <- ac_clean(
   remove_url          = TRUE,
   remove_email        = TRUE,
   remove_hashtags     = TRUE,       # novo: remove #termos separado de símbolos
-  remove_mentions     = TRUE,       # novo: remove @usuario separado de símbolos
+  remove_mentions     = TRUE,       # novo: remove @usuário separado de símbolos
   remove_stopwords    = "pt-legislativo",
   extra_stopwords     = sw,         # novo: stopwords adicionais ao preset
   protect             = c("PT", "PL", "CCJ"),  # siglas preservadas
@@ -191,7 +222,7 @@ corpus_limpo <- ac_clean(
   custom_replacements = list(       # novo: substituições livres antes da limpeza
     "pres\\."  = "presidente",
     "dep\\."   = "deputado",
-    "v\\.exa" = "vossa excelencia"
+    "v\\.exa" = "vossa excelência"
   ),
   min_char            = 3L,         # novo: descarta tokens com menos de 3 chars
   handle_na           = "remove",   # novo: remove documentos com texto NA
@@ -201,10 +232,10 @@ corpus_limpo <- ac_clean(
 
 O argumento `verbose = TRUE` exibe um resumo com tokens antes e depois,
 quantos foram removidos por etapa e quantos documentos ficaram vazios após
-a limpeza — útil para calibrar os parâmetros antes de rodar o pipeline
+a limpeza: útil para calibrar os parâmetros antes de rodar o pipeline
 completo.
 
-### Passo 3 — Definir o codebook
+### Passo 3: Definir o codebook
 
 ```r
 codebook <- ac_qual_codebook(
@@ -231,7 +262,7 @@ codebook <- ac_qual_codebook(
 )
 ```
 
-### Passo 4 — Classificar com LLM
+### Passo 4: Classificar com LLM
 
 ```r
 chat_obj <- chat_groq(
@@ -250,10 +281,10 @@ resultado <- ac_qual_code(
 )
 ```
 
-### Passo 5 — Validar com codificadores humanos
+### Passo 5: Validar com codificadores humanos
 
 ```r
-amostra <- ac_qual_sample(resultado, n = 15, strategy = "uncertainty")
+amostra <- ac_qual_sample(resultado, n = 15)   # aleatória (padrão): representativa
 ac_qual_export_for_review(sample = amostra, path = "revisao.xlsx", corpus = corpus_limpo)
 
 humano <- ac_qual_import_human("revisao.xlsx")
@@ -349,6 +380,21 @@ ac_plot_cooccurrence(cooc, top_n = 30)
 
 lda  <- ac_lda(tokens, k = 5)
 ac_plot_lda_topics(lda)
+
+# Novidades: diagnóstico, escalas e dicionários
+ac_readability(corpus_limpo)
+ac_lexical_diversity(corpus_limpo)
+ac_kwic(corpus_limpo, pattern = "reforma", window = 5)
+ac_collocations(corpus_limpo, measure = "pmi")
+
+dicionario <- ac_build_dictionary(
+  economia = c("imposto", "orcamento", "deficit"),
+  saude    = c("saude", "vacina", "hospital")
+)
+ac_dictionary(corpus_limpo, dicionario)
+
+ca <- ac_ca(corpus_limpo, by = "partido")
+ac_plot_ca(ca)
 ```
 
 ---
@@ -357,7 +403,7 @@ ac_plot_lda_topics(lda)
 
 Um guia rápido do objetivo ao código. Cada linha aponta a função principal
 e a vignette com o exemplo completo. As demais funções são variações ou
-utilitários — veja **[Funções disponíveis (completo)](https://ahenriquecp.com/acR/reference/)**.
+utilitários. Veja **[Funções disponíveis (completo)](https://ahenriquecp.com/acR/reference/)**.
 
 | Objetivo | Função | Vignette |
 |---|---|---|
@@ -384,46 +430,58 @@ utilitários — veja **[Funções disponíveis (completo)](https://ahenriquecp.
 | Classificar com modelo local em escala (checkpoint, retries, tokens) | `ac_chat_local()` · `ac_estimate_tokens()` | [LLM local em escala](https://ahenriquecp.com/acR/articles/llm-local-em-escala.html) |
 | Relatório metodológico reprodutível | `ac_qual_report()` | [Replicabilidade](https://ahenriquecp.com/acR/articles/replicabilidade.html) |
 | Exportar (CSV, LaTeX, Excel, RDS) | `ac_export()` | [Replicabilidade](https://ahenriquecp.com/acR/articles/replicabilidade.html) |
+| Legibilidade (Flesch em português) | `ac_readability()` → `ac_plot_readability()` | [Quantitativo §10](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Diversidade lexical (TTR, Herdan's C, MTLD) | `ac_lexical_diversity()` → `ac_plot_lexical_diversity()` | [Quantitativo §10](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Diagnóstico de corpus (Lei de Zipf) | `ac_plot_zipf()` | [Quantitativo §11](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Concordância/contexto de um termo (KWIC) | `ac_kwic()` | [Quantitativo §12](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Bigramas/trigramas estatisticamente associados | `ac_collocations()` | [Quantitativo §12](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Série temporal/diacrônica de uma métrica | `ac_temporal()` → `ac_plot_temporal()` | [Quantitativo §13](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Posicionar documentos numa escala (Wordscores) | `ac_wordscores()` → `ac_plot_wordscores()` | [Quantitativo §14](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Dicionário multi-categoria (temas, enquadramentos) | `ac_dictionary()` · `ac_build_dictionary()` | [Quantitativo §15](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Léxico de emoções (tipo NRC) | `ac_emotion()` | [Quantitativo §15](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Importar/salvar dicionário (YAML/CSV) | `ac_dictionary_import()` · `ac_dictionary_save()`/`ac_dictionary_load()` | [Quantitativo §15](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Validar dicionário contra codificação humana | `ac_dictionary_validate()` | [Quantitativo §15](https://ahenriquecp.com/acR/articles/quantitativo.html) |
+| Biplot documentos/grupos × termos (análise de correspondência) | `ac_ca()` → `ac_plot_ca()` | [Quantitativo §16](https://ahenriquecp.com/acR/articles/quantitativo.html) |
 
 ---
 
 ## Cobertura de testes
 
-Suite de **487 blocos `test_that`**, cobrindo boa parte do código
+Suite de **561 blocos `test_that`**, cobrindo boa parte do código
 (medido com `covr::package_coverage()`). Testes de
 integração com APIs externas (Câmara, Senado, LLM) usam `skip_on_cran()`
-e verificação prévia de disponibilidade — não bloqueiam CI offline nem
+e verificação prévia de disponibilidade: não bloqueiam CI offline nem
 o `R CMD check` da CRAN.
 
 ---
 
 ## Documentação
 
-Site completo: **<https://ahenriquecp.com/acR/>** — vignettes navegáveis,
+Site completo: **<https://ahenriquecp.com/acR/>**, com vignettes navegáveis,
 referência de todas as funções e changelog.
 
 ### Comece por aqui
 
-- [Quickstart (5 min)](https://ahenriquecp.com/acR/articles/quickstart.html) — do zero ao primeiro gráfico.
-- [Visão geral do pacote](https://ahenriquecp.com/acR/articles/introducao-acR.html) — pipeline em uma hora.
-- [Replicabilidade ponta-a-ponta](https://ahenriquecp.com/acR/articles/replicabilidade.html) — do dado bruto ao relatório reprodutível.
+- [Quickstart (5 min)](https://ahenriquecp.com/acR/articles/quickstart.html): do zero ao primeiro gráfico.
+- [Visão geral do pacote](https://ahenriquecp.com/acR/articles/introducao-acR.html): pipeline em uma hora.
+- [Replicabilidade ponta-a-ponta](https://ahenriquecp.com/acR/articles/replicabilidade.html): do dado bruto ao relatório reprodutível.
 
 ### Pipeline qualitativo (LLMs)
 
-- [Codificação com LLMs — guia completo](https://ahenriquecp.com/acR/articles/qualitativo-llm.html) — codebook, self-consistency, revisão humana e concordância.
-- [Estudo de caso: proposições legislativas](https://ahenriquecp.com/acR/articles/analise-proposicoes.html) — aplicação real com dados da Câmara.
+- [Codificação com LLMs: guia completo](https://ahenriquecp.com/acR/articles/qualitativo-llm.html): codebook, self-consistency, revisão humana e concordância.
+- [Estudo de caso: proposições legislativas](https://ahenriquecp.com/acR/articles/analise-proposicoes.html): aplicação real com dados da Câmara.
 
 ### Pipeline quantitativo
 
-- [Frequências, keyness e coocorrência](https://ahenriquecp.com/acR/articles/quantitativo.html) — inclui nuvens de palavras (ggwordcloud), comparativa entre grupos, TF-IDF por tema, coocorrência com PMI/heatmap.
-- [Agrupamento não supervisionado de documentos](https://ahenriquecp.com/acR/articles/cluster.html) — hclust, k-means, PAM; 6 visualizações e comparação lado-a-lado com LDA.
-- [Análise de sentimento (OpLexicon)](https://ahenriquecp.com/acR/articles/sentimento.html) — polaridade e sentimento agregado por documento.
-- [Modelagem de tópicos (LDA)](https://ahenriquecp.com/acR/articles/lda.html) — escolha de `k`, interpretação de tópicos e visualização.
+- [Frequências, keyness e coocorrência](https://ahenriquecp.com/acR/articles/quantitativo.html): inclui nuvens de palavras (ggwordcloud), comparativa entre grupos, TF-IDF por tema, coocorrência com PMI/heatmap.
+- [Agrupamento não supervisionado de documentos](https://ahenriquecp.com/acR/articles/cluster.html): hclust, k-means, PAM; 6 visualizações e comparação lado-a-lado com LDA.
+- [Análise de sentimento (OpLexicon)](https://ahenriquecp.com/acR/articles/sentimento.html): polaridade e sentimento agregado por documento.
+- [Modelagem de tópicos (LDA)](https://ahenriquecp.com/acR/articles/lda.html): escolha de `k`, interpretação de tópicos e visualização.
 
 ### Referência de funções
 
-- [Índice completo por área](https://ahenriquecp.com/acR/reference/) — Coleta, Corpus, Análise qualitativa (LLM), Análise quantitativa, Validação e confiabilidade, Visualização, Replicabilidade, Exportação.
-- [Notícias / changelog](https://ahenriquecp.com/acR/news/) — histórico de versões (atual: **0.3.3**).
+- [Índice completo por área](https://ahenriquecp.com/acR/reference/): Coleta, Corpus, Análise qualitativa (LLM), Análise quantitativa, Validação e confiabilidade, Visualização, Replicabilidade, Exportação.
+- [Notícias / changelog](https://ahenriquecp.com/acR/news/): histórico de versões (atual: **0.6.0**).
 
 ---
 
@@ -435,8 +493,8 @@ citation("acR")
 
 ```
 Henrique, A. (2026). acR: Análise de Conteúdo em R.
-R package version 0.3.3. ORCID: 0000-0002-1842-2725.
-Centro de Estudos da Metrópole (CEM-Cepid) — Universidade de São Paulo.
+R package version 0.6.0. ORCID: 0000-0002-1842-2725.
+Centro de Estudos da Metrópole (CEM-Cepid), Universidade de São Paulo.
 https://ahenriquecp.com/acR/
 ```
 
@@ -447,7 +505,7 @@ https://ahenriquecp.com/acR/
 O autor utilizou o modelo de linguagem Claude (Sonnet 5 e Opus 4.8
 da Anthropic), operado por meio do ambiente **Claude Code / Cowork**,
 como ferramenta de apoio à depuração e à estruturação do código do
-pacote `acR` — incluindo a identificação e correção de bugs, a
+pacote `acR`, incluindo a identificação e correção de bugs, a
 refatoração de funções, a escrita de testes automatizados e a redação
 da documentação (vignettes e roxygen). O autor assume integral
 responsabilidade pela correção técnica e científica do material
@@ -480,7 +538,7 @@ system. *arXiv*, 2205.01833.
 
 Sampaio, R. C., & Lycarião, D. (2021). *Análise de conteúdo categorial:
 manual de aplicação*. Brasília: ENAP.
-<https://repositorio.enap.gov.br/handle/1/6542>
+<https://repositorio.enap.gov.br/items/ab24ee50-6283-471d-8024-ce8049b1c5da>
 
 Santos, V. (2024). *senatebR: Functions to collect data from the Brazilian
 Senate*. R package version 0.1.0. <https://github.com/vsntos/senatebR>
@@ -489,7 +547,7 @@ Souza, M., & Vieira, R. (2012). Sentiment analysis on Twitter data for
 Portuguese language. *PROPOR*.
 
 Wang, X. et al. (2023). Self-consistency improves chain of thought reasoning
-in language models. *EMNLP*.
+in language models. *ICLR*.
 
 Wickham, H. et al. (2025). *ellmer: Chat with Large Language Models*. Posit.
 <https://ellmer.tidyverse.org>
@@ -498,5 +556,5 @@ Wickham, H. et al. (2025). *ellmer: Chat with Large Language Models*. Posit.
 
 ## Licença
 
-MIT © Anderson Henrique ([ORCID: 0000-0002-1842-2725](https://orcid.org/0000-0002-1842-2725)) —
+MIT © Anderson Henrique ([ORCID: 0000-0002-1842-2725](https://orcid.org/0000-0002-1842-2725)).
 Centro de Estudos da Metrópole (CEM-Cepid), Universidade de São Paulo.

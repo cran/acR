@@ -188,11 +188,11 @@ knitr::opts_chunk$set(
 # )
 
 ## ----validacao----------------------------------------------------------------
-# # Exportar amostra priorizando casos incertos
+# # Amostra aleatória para estimar a confiabilidade
 # amostra <- ac_qual_sample(
 #   resultado,
 #   n        = 5,
-#   strategy = "uncertainty"
+#   strategy = "random"
 # )
 # 
 # ac_qual_export_for_review(

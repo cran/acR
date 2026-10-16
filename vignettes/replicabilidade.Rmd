@@ -1,11 +1,11 @@
 ---
-title: "Replicabilidade ponta-a-ponta — do codebook ao relatório de método"
+title: "Replicabilidade ponta-a-ponta: do codebook ao relatório de método"
 output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
 vignette: >
-  %\VignetteIndexEntry{Replicabilidade ponta-a-ponta — do codebook ao relatório de método}
+  %\VignetteIndexEntry{Replicabilidade ponta-a-ponta: do codebook ao relatório de método}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -35,35 +35,35 @@ paga); a estrutura, formatos e sequência são idênticos a uma rodada real.
 
 ## O pipeline em 6 etapas
 
-1. **Coleta** — corpus real ou fabricado
-2. **Codebook** — instrumento analítico (`ac_qual_codebook`)
-3. **Classificação** — LLM com `live view` (`ac_qual_code(live = ...)`)
-4. **Amostragem para revisão** — `ac_qual_sample()`
-5. **Confiabilidade inter-codificador** — `ac_qual_reliability()`
-6. **Relatório de método** — `ac_qual_report()`
+1. **Coleta**: corpus real ou fabricado
+2. **Codebook**: instrumento analítico (`ac_qual_codebook`)
+3. **Classificação**: LLM com `live view` (`ac_qual_code(live = ...)`)
+4. **Amostragem para revisão**: `ac_qual_sample()`
+5. **Confiabilidade inter-codificador**: `ac_qual_reliability()`
+6. **Relatório de método**: `ac_qual_report()`
 
 ## 1. Corpus
 
 Corpus fabricado de 12 pronunciamentos com posição declarada
-(favor/contra/neutro) — em uso real, este data.frame viria de
+(favor/contra/neutro). Em uso real, este data.frame viria de
 `ac_fetch_camara()`, `ac_fetch_senado()` ou de importação de PDFs.
 
 ```{r corpus}
 df <- data.frame(
   doc_id = paste0("d", sprintf("%02d", 1:12)),
   text = c(
-    "Apoio integralmente esta reforma que simplifica o sistema tributario.",
+    "Apoio integralmente esta reforma que simplifica o sistema tributário.",
     "Sou favoravel a proposta: reduz distorcoes historicas do setor.",
     "Voto sim com plena adesao: precisamos modernizar a estrutura fiscal.",
-    "Aprovo a reforma tributaria, e uma conquista para o desenvolvimento.",
+    "Aprovo a reforma tributária, e uma conquista para o desenvolvimento.",
     "Rejeito esta proposta, e um retrocesso para os trabalhadores.",
     "Voto contra: a reforma prejudica os mais pobres e as pequenas empresas.",
-    "Sou contrario a essa proposta, ela beneficia apenas grandes corporacoes.",
-    "Nao apoio o texto atual, precisa de revisao profunda antes da votacao.",
+    "Sou contrário a essa proposta, ela beneficia apenas grandes corporacoes.",
+    "Não apoio o texto atual, precisa de revisao profunda antes da votacao.",
     "O texto substitutivo altera o artigo 145 da Constituicao Federal.",
-    "O relatorio incorporou 47 emendas apresentadas em plenario.",
+    "O relatório incorporou 47 emendas apresentadas em plenário.",
     "A comissao aprovou o parecer com 15 votos a favor e 8 contra.",
-    "O projeto seguira para votacao na proxima sessao ordinaria."
+    "O projeto seguira para votacao na próxima sessão ordinária."
   ),
   partido = c("PT","PSD","PL","MDB","PSOL","PT","PDT","PSOL",
               "MDB","PSDB","PL","MDB"),
@@ -84,12 +84,12 @@ exemplos positivos e negativos para desambiguar categorias vizinhas.
 cb <- ac_qual_codebook(
   name         = "posicao_reforma_tributaria",
   instructions = paste(
-    "Classifique a posicao do parlamentar sobre a reforma tributaria",
+    "Classifique a posicao do parlamentar sobre a reforma tributária",
     "com base no discurso apresentado."
   ),
   categories = list(
     favor = list(
-      definition   = "Apoio explicito a aprovacao da reforma tributaria.",
+      definition   = "Apoio explicito a aprovacao da reforma tributária.",
       examples_pos = c("Sou a favor desta reforma que simplifica o sistema."),
       examples_neg = c("O texto altera o artigo 145 da Constituicao Federal."),
       weight       = 1
@@ -101,8 +101,8 @@ cb <- ac_qual_codebook(
       weight       = 1.2  # categoria com mais dificuldade retorica
     ),
     neutro = list(
-      definition   = "Discurso tecnico ou processual, sem posicionamento claro.",
-      examples_pos = c("O relatorio incorporou emendas apresentadas."),
+      definition   = "Discurso técnico ou processual, sem posicionamento claro.",
+      examples_pos = c("O relatório incorporou emendas apresentadas."),
       examples_neg = c("Sou totalmente contra esta proposta.")
     )
   ),
@@ -166,11 +166,11 @@ resultado <- tibble::tibble(
     "'Aprovo' e 'conquista' marcam adesao.",
     "'Rejeito' e 'retrocesso' marcam oposicao.",
     "'Voto contra' e argumento distributivo.",
-    "'Sou contrario' com justificativa.",
-    "'Nao apoio' + pede revisao (borderline neutro/contra).",
+    "'Sou contrário' com justificativa.",
+    "'Não apoio' + pede revisao (borderline neutro/contra).",
     "Descreve alteracao normativa sem posicionar.",
     "Descreve processo legislativo.",
-    "Numeros do resultado, sem opiniao. Borderline.",
+    "Números do resultado, sem opiniao. Borderline.",
     "Encaminhamento processual."
   )
 )
@@ -195,14 +195,19 @@ resultado |>
 
 ## 4. Amostra para revisão humana
 
-`ac_qual_sample(strategy = "uncertainty")` prioriza documentos com menor
-`confidence_score` — foca o esforço humano onde o LLM mais errou.
+Para **estimar a confiabilidade** que vai para o artigo, a amostra
+precisa ser representativa do corpus (Krippendorff, 2018, cap. 12):
+use `strategy = "random"` (padrão) ou `"proportional"`. A estratégia
+`"uncertainty"`, que prioriza documentos com menor `confidence_score`, é
+útil para outra coisa: **diagnosticar erros** e refinar o codebook. A
+concordância calculada nela não representa o corpus, porque a amostra
+foi escolhida justamente entre os casos difíceis.
 
 ```{r amostra}
 amostra <- ac_qual_sample(
   resultado,
   n        = 4,
-  strategy = "uncertainty"
+  strategy = "random"
 )
 amostra |> dplyr::select(doc_id, categoria, confidence_score, sample_reason)
 ```
@@ -220,14 +225,14 @@ revisado <- ac_qual_import_human("revisao.xlsx")
 ## 5. Confiabilidade inter-codificador
 
 Simulamos a revisão humana (com 1 discordância em 12) e calculamos as
-métricas de concordância — no artigo, essas métricas aparecem na seção
+métricas de concordância: no artigo, essas métricas aparecem na seção
 de método:
 
 ```{r reliability}
 humano <- tibble::tibble(
   doc_id    = resultado$doc_id,
   categoria = c(rep("favor", 4), rep("contra", 4),
-                "neutro","neutro","favor","neutro")  # 1 discordancia
+                "neutro","neutro","favor","neutro")  # 1 discordância
 )
 
 irr <- ac_qual_reliability(
@@ -238,22 +243,48 @@ irr <- ac_qual_reliability(
 irr
 ```
 
-## 6. Relatório de método — replicabilidade automática
+> **Como ler esta tabela**
+>
+> 1. **Onde olhar.** Uma linha por métrica. Leia três colunas juntas:
+>    `estimate` (o valor), `ci_lower` e `ci_upper` (o intervalo de
+>    confiança: onde o valor verdadeiro provavelmente está) e
+>    `interpretation` (o rótulo, segundo a referência própria de cada
+>    métrica).
+>
+> 2. **O que este exemplo mostra.** Com 1 discordância em 12 documentos,
+>    o *percent agreement* é ≈ 0,92. As métricas que descontam o acaso
+>    ficam um pouco abaixo: alfa de Krippendorff ≈ 0,88 e AC1 de Gwet ≈
+>    0,87. O alfa recebe o rótulo "confiável" (acima de 0,800), **mas**
+>    o intervalo dele vai de ≈ 0,58 a 1.
+>
+> 3. **Em palavras simples.** O valor pontual parece ótimo, mas com 12
+>    documentos a incerteza é grande: o alfa verdadeiro pode estar
+>    abaixo do mínimo aceitável de 0,667.
+>
+> 4. **Cuidado.** O rótulo vem do valor pontual; a decisão deve olhar o
+>    intervalo. Krippendorff (2018, sec. 12.5) decide pela chance de o
+>    alfa estar abaixo do mínimo exigido, e aqui essa chance não é
+>    pequena. Com 12 documentos não dá para afirmar que a codificação é
+>    confiável: aumente a amostra (Neuendorf, 2017, sugere ao menos 50
+>    unidades). O exemplo usa só 100 réplicas *bootstrap* para rodar
+>    rápido; em uso real, deixe o padrão de 1000.
+
+## 6. Relatório de método: replicabilidade automática
 
 Aqui está o **coração desta vignette**: `ac_qual_report()` empacota
-tudo — codebook, config LLM, distribuição de resultados, métricas de
-IRR — em um documento único, pronto para anexar como material
+tudo (codebook, config LLM, distribuição de resultados, métricas de
+IRR) em um documento único, pronto para anexar como material
 suplementar de um artigo.
 
 ```{r report}
-arquivo_md <- tempfile(pattern = "relatorio-", fileext = ".md")
+arquivo_md <- tempfile(pattern = "relatório-", fileext = ".md")
 
 ac_qual_report(
   coded       = resultado,
   codebook    = cb,
   reliability = irr,
   chat        = "anthropic/claude-sonnet-4-5",  # ou objeto Chat
-  title       = "Classificacao de posicionamento na reforma tributaria",
+  title       = "Classificação de posicionamento na reforma tributária",
   author      = "Silva, A.; Souza, B.",
   method      = "Corpus de 12 pronunciamentos parlamentares (2023-2024).",
   format      = "md",
@@ -296,14 +327,14 @@ library(acR); library(ellmer)
 corpus    <- ac_corpus(meu_data_frame)
 cb        <- ac_qual_codebook(name = "...", instructions = "...", categories = list(...))
 resultado <- ac_qual_code(corpus, cb, chat = chat_anthropic("..."), live = "terminal")
-amostra   <- ac_qual_sample(resultado, n = 30, strategy = "uncertainty")
+amostra   <- ac_qual_sample(resultado, n = 30)   # aleatória: representativa
 # ... revisao humana ...
 irr       <- ac_qual_reliability(llm = resultado, human = revisado)
 ac_qual_report(resultado, cb, reliability = irr, path = "metodo.md")
 ```
 
 Seis funções principais, um pipeline reproduzível, um relatório
-automático — do texto bruto ao apêndice metodológico do artigo.
+automático: do texto bruto ao apêndice metodológico do artigo.
 
 ## Referências
 
@@ -311,5 +342,10 @@ automático — do texto bruto ao apêndice metodológico do artigo.
   workers for text-annotation tasks. *PNAS*, 120(30).
 * Krippendorff, K. (2018). *Content Analysis: An Introduction to Its
   Methodology* (4th ed.). SAGE.
-* Wang, X. et al. (2022). Self-consistency improves chain-of-thought
-  reasoning in language models. *arXiv:2203.11171*.
+* Landis, J. R.; Koch, G. G. (1977). The measurement of observer
+  agreement for categorical data. *Biometrics*, 33(1), 159-174.
+* Neuendorf, K. A. (2017). *The Content Analysis Guidebook* (2nd ed.).
+  SAGE.
+* Wang, X. et al. (2023). Self-consistency improves chain of thought
+  reasoning in language models. *International Conference on Learning
+  Representations (ICLR)*.

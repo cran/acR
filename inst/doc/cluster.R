@@ -17,6 +17,7 @@ library(ggplot2)
 library(dplyr)
 library(tidyr)
 set.seed(42)
+has_topicmodels <- requireNamespace("topicmodels", quietly = TRUE)
 
 ## ----corpus-------------------------------------------------------------------
 df <- data.frame(
@@ -31,14 +32,14 @@ df <- data.frame(
     "cidadania voto democracia representacao plural minorias",
     "liberdade participacao politica assembleia popular deliberacao",
     "democracia direta cidadania voto plebiscito referendo",
-    "mercado economia eficiencia privatizacao competicao livre",
-    "privatizacao mercado livre eficiencia produtividade lucro",
+    "mercado economia eficiência privatizacao competicao livre",
+    "privatizacao mercado livre eficiência produtividade lucro",
     "economia crescimento investimento mercado capital juros",
-    "eficiencia mercado economia livre concorrencia produtividade",
+    "eficiência mercado economia livre concorrência produtividade",
     "mercado privado investimento economia lucro capital risco",
-    "economia livre mercado eficiencia produtividade escala",
+    "economia livre mercado eficiência produtividade escala",
     "crescimento economico mercado investimento privatizacao abertura",
-    "mercado competicao eficiencia lucro capital privado"
+    "mercado competicao eficiência lucro capital privado"
   ),
   stringsAsFactors = FALSE
 )
@@ -110,27 +111,37 @@ if (requireNamespace("cluster", quietly = TRUE)) {
     ) +
     scale_x_continuous(breaks = ks) +
     labs(
-      title    = "Silhueta media por numero de grupos",
+      title    = "Silhueta média por número de grupos",
       subtitle = "Circulo vazado = k escolhido automaticamente",
-      x = "k (numero de clusters)", y = "Silhueta media"
+      x = "k (número de clusters)", y = "Silhueta média"
     ) +
     theme_ac()
 }
 
-## ----plot-lda-vs-cluster, fig.height=5.5--------------------------------------
-lda_fit <- ac_lda(corpus, k = 2, seed = 42)
+## ----aviso-topicmodels-cluster, echo=FALSE, results="asis", eval=!has_topicmodels----
+# cat(
+#   "> **Nota:** o pacote `topicmodels` não está instalado neste ambiente;",
+#   "o gráfico comparativo abaixo foi omitido. Instale com",
+#   "`install.packages(\"topicmodels\")` para reproduzi-lo."
+# )
+
+## ----plot-lda-vs-cluster, eval=has_topicmodels, fig.height=5.5----------------
+# Gibbs com alpha baixo: adequado a textos curtos de tema único
+# (ver vignette("lda"), seção 3)
+lda_fit <- ac_lda(corpus, k = 2, seed = 42, method = "Gibbs",
+                  control = list(alpha = 0.1, iter = 2000, burnin = 500))
 
 hard <- clust$assignments |>
   mutate(valor = 1, tipo = paste0("Cluster ", cluster)) |>
   select(doc_id, tipo, valor)
 
 soft <- lda_fit$documents |>
-  mutate(tipo = paste0("Topico ", topic), valor = gamma) |>
+  mutate(tipo = paste0("Tópico ", topic), valor = gamma) |>
   select(doc_id, tipo, valor)
 
 plot_df <- bind_rows(
   hard |> mutate(painel = "Hard clustering\n(1 = pertence)"),
-  soft |> mutate(painel = "LDA (soft)\n(gamma = proporcao)")
+  soft |> mutate(painel = "LDA (soft)\n(gamma = proporção)")
 ) |>
   mutate(doc_id = factor(doc_id, levels = rev(sort(unique(doc_id)))))
 
@@ -140,7 +151,7 @@ ggplot(plot_df, aes(tipo, doc_id, fill = valor)) +
   scale_fill_gradient(low = "#F1F5F9", high = ac_palette(1), name = "Valor") +
   labs(
     title    = "Hard vs. soft: a mesma pergunta, duas respostas",
-    subtitle = "Cluster da uma etiqueta; LDA da proporcoes por documento",
+    subtitle = "Cluster da uma etiqueta; LDA da proporções por documento",
     x = NULL, y = NULL,
     caption = "acR • ac_cluster_documents vs. ac_lda"
   ) +

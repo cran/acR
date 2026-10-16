@@ -97,7 +97,7 @@ print(corpus)
 
 O codebook define as cinco categorias de posicionamento com suas definições
 operacionais. A instrução orienta o modelo a usar `Populista` para textos
-com apelo emocional sem argumentação substantiva — uma distinção importante
+com apelo emocional sem argumentação substantiva: uma distinção importante
 para a análise de discursos parlamentares brasileiros.
 
 ```{r codebook}
@@ -281,7 +281,7 @@ ac_qual_save_codebook(
 
 O argumento `chat =` recebe qualquer objeto `Chat` do **ellmer**. Aqui usamos
 o Groq com `openai/gpt-oss-120b`, que oferece plano gratuito e latência
-baixa — ideal para corpora de tamanho médio como este.
+baixa: ideal para corpora de tamanho médio como este.
 
 ```{r classificar}
 chat_obj <- chat_groq(
@@ -300,8 +300,9 @@ resultado <- ac_qual_code(
 )
 ```
 
-Os resultados esperados para este corpus, dado o conteúdo inequívoco dos
-textos, são classificações com confiança alta (≥ 0.80) em todos os documentos:
+Os resultados esperados para este corpus, dado o conteúdo majoritariamente
+inequívoco dos textos, são classificações com confiança alta (≥ 0.80) na
+maioria dos documentos, com uma exceção deliberadamente ambígua:
 
 ```
 ## # A tibble: 9 × 5
@@ -319,23 +320,49 @@ textos, são classificações com confiança alta (≥ 0.80) em todos os documen
 ```
 
 O texto `pl2858_favor` ("Presos políticos: votar pela anistia é votar pela
-democracia") recebeu `populista` com confiança 0.667 — caso limítrofe que
+democracia") recebeu `populista` com confiança 0.667, caso limítrofe que
 ilustra a utilidade do self-consistency para identificar documentos ambíguos
 que merecem revisão humana prioritária.
+
+> **Como ler esta tabela**
+>
+> 1. **Onde olhar.** Olhe a última coluna, `confidence_score`, e procure
+>    valores **abaixo de 1,000**. Com `k_consistency = 3L`, 1,000 = as
+>    três rodadas escolheram a mesma categoria; 0,667 = duas escolheram,
+>    uma discordou.
+>
+> 2. **O que este exemplo mostra.** 8 dos 9 documentos têm 1,000. A
+>    exceção é `pl2858_favor` (0,667), classificado como `populista`:
+>    "Presos políticos: votar pela anistia é votar pela democracia"
+>    defende a proposta com um apelo à democracia em tom de slogan, e
+>    uma das três rodadas leu isso como discurso populista em vez de
+>    posição favorável.
+>
+> 3. **Em palavras simples.** O modelo teve dúvida justamente no texto
+>    que um leitor humano também acharia ambíguo.
+>
+> 4. **Cuidado.** Confiança alta não garante acerto: as três rodadas
+>    podem errar do mesmo jeito. Documentos como `pl2858_favor` são bons
+>    candidatos a uma rodada de **diagnóstico** do codebook (`strategy =
+>    "uncertainty"`), separada da amostra **aleatória** que a seção 5
+>    usa para estimar a confiabilidade.
 
 ---
 
 ## 5. Validação humana
 
-A amostragem por `strategy = "uncertainty"` prioriza documentos com menor
-confiança, otimizando o esforço do codificador humano.
+A amostra de validação é aleatória (`strategy = "random"`, o padrão):
+para que a concordância medida nela represente o corpus inteiro, ela
+precisa ser representativa (Krippendorff, 2018, cap. 12). Priorizar os
+casos de menor confiança (`strategy = "uncertainty"`) serve para
+diagnosticar erros do codebook, não para estimar confiabilidade.
 
 ```{r validacao}
-# Exportar amostra priorizando casos incertos
+# Amostra aleatória para estimar a confiabilidade
 amostra <- ac_qual_sample(
   resultado,
   n        = 5,
-  strategy = "uncertainty"
+  strategy = "random"
 )
 
 ac_qual_export_for_review(
@@ -363,21 +390,52 @@ print(concordancia)
 ```
 
 ```
-## -- Confiabilidade inter-anotador (acR) --
-## * Documentos comparados: 5
+## ── Confiabilidade inter-anotador (acR) ──
+## • Documentos comparados: 5
+## • Categorias: contrario, favoravel, neutro_tecnico
 ##
-## Metrica                        Estimativa  Interpretacao
-## ──────────────────────────────────────────────────────────
-## Percent Agreement              1.000       Perfeita
-## Cohen's Kappa (unweighted)     1.000       Perfeita
-## Fleiss' Kappa                  1.000       Perfeita
-## Krippendorff's Alpha (nominal) 1.000       Perfeita
+## Metrica                         Estimativa  IC              Interpretacao
+## ---------------------------------------------------------------------------
+## Percent Agreement               1.000       --              alta (>= 90%; Neuendorf, 2017)
+## Cohen's Kappa (unweighted)      1.000       [1.000, 1.000]  quase perfeita (Landis & Koch, 1977)
+## Fleiss' Kappa                   1.000       [1.000, 1.000]  quase perfeita (Landis & Koch, 1977)
+## Krippendorff's Alpha (nominal)  1.000       [1.000, 1.000]  confiável (>= 0,800; Krippendorff, 2018)
 ```
+
+> **Como ler esta tabela**
+>
+> 1. **Onde olhar.** Uma linha por métrica. Olhe `Estimativa` (de 0 a
+>    1), o intervalo `IC` e a `Interpretacao`, que usa a referência
+>    própria de cada métrica: Landis & Koch (1977) para kappa,
+>    Krippendorff (2018) para o alfa, Neuendorf (2017) para o
+>    percentual. A matriz de confusão embaixo mostra onde humano e
+>    modelo discordaram (fora da diagonal).
+>
+> 2. **O que este exemplo mostra.** Todas as métricas valem 1,000 e a
+>    matriz de confusão só tem números na diagonal: nos 5 documentos
+>    revisados, humano e modelo deram exatamente a mesma categoria.
+>
+> 3. **Em palavras simples.** Concordância perfeita nesta amostra, o
+>    esperado para textos construídos com posições inequívocas.
+>
+> 4. **Cuidado.** O IC de [1,000; 1,000] **não** significa certeza. Com
+>    concordância perfeita, toda reamostra *bootstrap* também é
+>    perfeita, e o método não consegue expressar a incerteza de uma
+>    amostra de 5 documentos (Efron & Tibshirani, 1993). Reporte kappa
+>    ou alfa como medida principal (o percentual não desconta o acaso) e
+>    use uma amostra bem maior antes de afirmar confiabilidade.
 
 Concordância perfeita é esperada para este corpus, dado que os textos foram
 construídos com posicionamentos inequívocos. Em corpora reais com textos
-ambíguos, valores de kappa entre 0.61 e 0.80 são considerados adequados
-para publicação (Landis & Koch, 1977).
+ambíguos, o critério mais usado em análise de conteúdo é o de
+Krippendorff (2018, sec. 12.4): alfa a partir de 0,800 para conclusões
+sem ressalvas e entre 0,667 e 0,800 só para conclusões provisórias. As
+faixas de Landis & Koch (1977) ("substancial" para kappa entre 0,61 e
+0,80) são rótulos descritivos que os próprios autores chamam de
+arbitrários, não um critério de publicação. Com 5 documentos, como
+aqui, o intervalo de confiança é largo demais para qualquer conclusão:
+Neuendorf (2017) sugere ao menos 50 unidades na subamostra de
+confiabilidade.
 
 ---
 
@@ -405,7 +463,7 @@ resultado |>
 ```
 
 As três ementas foram corretamente classificadas como `neutro_tecnico` com
-confiança máxima — resultado consistente com a natureza jurídica desses textos.
+confiança máxima, resultado consistente com a natureza jurídica desses textos.
 
 ---
 
@@ -428,6 +486,9 @@ ac_export(resultado, formato = "latex", arquivo = "proposicoes_codificadas.tex")
 
 BARDIN, L. **Análise de conteúdo**. Edições 70, 2011.
 
+EFRON, B.; TIBSHIRANI, R. J. **An Introduction to the Bootstrap**. New
+York: Chapman & Hall, 1993.
+
 GILARDI, F.; ALIZADEH, M.; KUBLI, M. ChatGPT outperforms crowd workers for
 text-annotation tasks. **PNAS**, v. 120, n. 30, 2023.
 
@@ -436,6 +497,9 @@ KRIPPENDORFF, K. **Content Analysis: An Introduction to Its Methodology**.
 
 LANDIS, J. R.; KOCH, G. G. The measurement of observer agreement for
 categorical data. **Biometrics**, v. 33, n. 1, p. 159-174, 1977.
+
+NEUENDORF, K. A. **The Content Analysis Guidebook**. 2. ed. Thousand
+Oaks: SAGE, 2017.
 
 SAMPAIO, R. C.; LYCARIAO, D. **Análise de conteúdo categorial: manual
 de aplicação**. Brasília: ENAP, 2021.

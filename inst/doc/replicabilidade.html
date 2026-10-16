@@ -12,7 +12,7 @@
 
 
 
-<title>Replicabilidade ponta-a-ponta — do codebook ao relatório de método</title>
+<title>Replicabilidade ponta-a-ponta: do codebook ao relatório de método</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -337,7 +337,7 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 
 
 
-<h1 class="title toc-ignore">Replicabilidade ponta-a-ponta — do codebook
+<h1 class="title toc-ignore">Replicabilidade ponta-a-ponta: do codebook
 ao relatório de método</h1>
 
 
@@ -354,7 +354,7 @@ humana</a></li>
 <li><a href="#confiabilidade-inter-codificador" id="toc-confiabilidade-inter-codificador">5. Confiabilidade
 inter-codificador</a></li>
 <li><a href="#relat%C3%B3rio-de-m%C3%A9todo-replicabilidade-autom%C3%A1tica" id="toc-relatório-de-método-replicabilidade-automática">6. Relatório de
-método — replicabilidade automática</a></li>
+método: replicabilidade automática</a></li>
 <li><a href="#fluxo-completo-em-6-linhas" id="toc-fluxo-completo-em-6-linhas">Fluxo completo em 6 linhas</a></li>
 <li><a href="#refer%C3%AAncias" id="toc-referências">Referências</a></li>
 </ul>
@@ -372,40 +372,40 @@ idênticos a uma rodada real.</p>
 <div id="o-pipeline-em-6-etapas" class="section level2">
 <h2>O pipeline em 6 etapas</h2>
 <ol style="list-style-type: decimal">
-<li><strong>Coleta</strong> — corpus real ou fabricado</li>
-<li><strong>Codebook</strong> — instrumento analítico
+<li><strong>Coleta</strong>: corpus real ou fabricado</li>
+<li><strong>Codebook</strong>: instrumento analítico
 (<code>ac_qual_codebook</code>)</li>
-<li><strong>Classificação</strong> — LLM com <code>live view</code>
+<li><strong>Classificação</strong>: LLM com <code>live view</code>
 (<code>ac_qual_code(live = ...)</code>)</li>
-<li><strong>Amostragem para revisão</strong> —
+<li><strong>Amostragem para revisão</strong>:
 <code>ac_qual_sample()</code></li>
-<li><strong>Confiabilidade inter-codificador</strong> —
+<li><strong>Confiabilidade inter-codificador</strong>:
 <code>ac_qual_reliability()</code></li>
-<li><strong>Relatório de método</strong> —
+<li><strong>Relatório de método</strong>:
 <code>ac_qual_report()</code></li>
 </ol>
 </div>
 <div id="corpus" class="section level2">
 <h2>1. Corpus</h2>
 <p>Corpus fabricado de 12 pronunciamentos com posição declarada
-(favor/contra/neutro) — em uso real, este data.frame viria de
+(favor/contra/neutro). Em uso real, este data.frame viria de
 <code>ac_fetch_camara()</code>, <code>ac_fetch_senado()</code> ou de
 importação de PDFs.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
 <span id="cb1-2"><a href="#cb1-2" tabindex="-1"></a>  <span class="at">doc_id =</span> <span class="fu">paste0</span>(<span class="st">&quot;d&quot;</span>, <span class="fu">sprintf</span>(<span class="st">&quot;%02d&quot;</span>, <span class="dv">1</span><span class="sc">:</span><span class="dv">12</span>)),</span>
 <span id="cb1-3"><a href="#cb1-3" tabindex="-1"></a>  <span class="at">text =</span> <span class="fu">c</span>(</span>
-<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    <span class="st">&quot;Apoio integralmente esta reforma que simplifica o sistema tributario.&quot;</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" tabindex="-1"></a>    <span class="st">&quot;Apoio integralmente esta reforma que simplifica o sistema tributário.&quot;</span>,</span>
 <span id="cb1-5"><a href="#cb1-5" tabindex="-1"></a>    <span class="st">&quot;Sou favoravel a proposta: reduz distorcoes historicas do setor.&quot;</span>,</span>
 <span id="cb1-6"><a href="#cb1-6" tabindex="-1"></a>    <span class="st">&quot;Voto sim com plena adesao: precisamos modernizar a estrutura fiscal.&quot;</span>,</span>
-<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    <span class="st">&quot;Aprovo a reforma tributaria, e uma conquista para o desenvolvimento.&quot;</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" tabindex="-1"></a>    <span class="st">&quot;Aprovo a reforma tributária, e uma conquista para o desenvolvimento.&quot;</span>,</span>
 <span id="cb1-8"><a href="#cb1-8" tabindex="-1"></a>    <span class="st">&quot;Rejeito esta proposta, e um retrocesso para os trabalhadores.&quot;</span>,</span>
 <span id="cb1-9"><a href="#cb1-9" tabindex="-1"></a>    <span class="st">&quot;Voto contra: a reforma prejudica os mais pobres e as pequenas empresas.&quot;</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>    <span class="st">&quot;Sou contrario a essa proposta, ela beneficia apenas grandes corporacoes.&quot;</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>    <span class="st">&quot;Nao apoio o texto atual, precisa de revisao profunda antes da votacao.&quot;</span>,</span>
+<span id="cb1-10"><a href="#cb1-10" tabindex="-1"></a>    <span class="st">&quot;Sou contrário a essa proposta, ela beneficia apenas grandes corporacoes.&quot;</span>,</span>
+<span id="cb1-11"><a href="#cb1-11" tabindex="-1"></a>    <span class="st">&quot;Não apoio o texto atual, precisa de revisao profunda antes da votacao.&quot;</span>,</span>
 <span id="cb1-12"><a href="#cb1-12" tabindex="-1"></a>    <span class="st">&quot;O texto substitutivo altera o artigo 145 da Constituicao Federal.&quot;</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>    <span class="st">&quot;O relatorio incorporou 47 emendas apresentadas em plenario.&quot;</span>,</span>
+<span id="cb1-13"><a href="#cb1-13" tabindex="-1"></a>    <span class="st">&quot;O relatório incorporou 47 emendas apresentadas em plenário.&quot;</span>,</span>
 <span id="cb1-14"><a href="#cb1-14" tabindex="-1"></a>    <span class="st">&quot;A comissao aprovou o parecer com 15 votos a favor e 8 contra.&quot;</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>    <span class="st">&quot;O projeto seguira para votacao na proxima sessao ordinaria.&quot;</span></span>
+<span id="cb1-15"><a href="#cb1-15" tabindex="-1"></a>    <span class="st">&quot;O projeto seguira para votacao na próxima sessão ordinária.&quot;</span></span>
 <span id="cb1-16"><a href="#cb1-16" tabindex="-1"></a>  ),</span>
 <span id="cb1-17"><a href="#cb1-17" tabindex="-1"></a>  <span class="at">partido =</span> <span class="fu">c</span>(<span class="st">&quot;PT&quot;</span>,<span class="st">&quot;PSD&quot;</span>,<span class="st">&quot;PL&quot;</span>,<span class="st">&quot;MDB&quot;</span>,<span class="st">&quot;PSOL&quot;</span>,<span class="st">&quot;PT&quot;</span>,<span class="st">&quot;PDT&quot;</span>,<span class="st">&quot;PSOL&quot;</span>,</span>
 <span id="cb1-18"><a href="#cb1-18" tabindex="-1"></a>              <span class="st">&quot;MDB&quot;</span>,<span class="st">&quot;PSDB&quot;</span>,<span class="st">&quot;PL&quot;</span>,<span class="st">&quot;MDB&quot;</span>),</span>
@@ -428,7 +428,7 @@ importação de PDFs.</p>
 <span id="cb1-35"><a href="#cb1-35" tabindex="-1"></a><span class="co">#&gt; 1 doc_1      Apoio integralmente esta reforma que simplifica… d01        PT     </span></span>
 <span id="cb1-36"><a href="#cb1-36" tabindex="-1"></a><span class="co">#&gt; 2 doc_2      Sou favoravel a proposta: reduz distorcoes hist… d02        PSD    </span></span>
 <span id="cb1-37"><a href="#cb1-37" tabindex="-1"></a><span class="co">#&gt; 3 doc_3      Voto sim com plena adesao: precisamos moderniza… d03        PL     </span></span>
-<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co">#&gt; 4 doc_4      Aprovo a reforma tributaria, e uma conquista pa… d04        MDB    </span></span>
+<span id="cb1-38"><a href="#cb1-38" tabindex="-1"></a><span class="co">#&gt; 4 doc_4      Aprovo a reforma tributária, e uma conquista pa… d04        MDB    </span></span>
 <span id="cb1-39"><a href="#cb1-39" tabindex="-1"></a><span class="co">#&gt; 5 doc_5      Rejeito esta proposta, e um retrocesso para os … d05        PSOL   </span></span>
 <span id="cb1-40"><a href="#cb1-40" tabindex="-1"></a><span class="co">#&gt; 6 doc_6      Voto contra: a reforma prejudica os mais pobres… d06        PT     </span></span>
 <span id="cb1-41"><a href="#cb1-41" tabindex="-1"></a><span class="co">#&gt; # ℹ 6 more rows</span></span></code></pre></div>
@@ -441,12 +441,12 @@ positivos e negativos para desambiguar categorias vizinhas.</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a>cb <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook</span>(</span>
 <span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>  <span class="at">name         =</span> <span class="st">&quot;posicao_reforma_tributaria&quot;</span>,</span>
 <span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a>  <span class="at">instructions =</span> <span class="fu">paste</span>(</span>
-<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="st">&quot;Classifique a posicao do parlamentar sobre a reforma tributaria&quot;</span>,</span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a>    <span class="st">&quot;Classifique a posicao do parlamentar sobre a reforma tributária&quot;</span>,</span>
 <span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a>    <span class="st">&quot;com base no discurso apresentado.&quot;</span></span>
 <span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a>  ),</span>
 <span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a>  <span class="at">categories =</span> <span class="fu">list</span>(</span>
 <span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a>    <span class="at">favor =</span> <span class="fu">list</span>(</span>
-<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Apoio explicito a aprovacao da reforma tributaria.&quot;</span>,</span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Apoio explicito a aprovacao da reforma tributária.&quot;</span>,</span>
 <span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;Sou a favor desta reforma que simplifica o sistema.&quot;</span>),</span>
 <span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a>      <span class="at">examples_neg =</span> <span class="fu">c</span>(<span class="st">&quot;O texto altera o artigo 145 da Constituicao Federal.&quot;</span>),</span>
 <span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a>      <span class="at">weight       =</span> <span class="dv">1</span></span>
@@ -458,8 +458,8 @@ positivos e negativos para desambiguar categorias vizinhas.</p>
 <span id="cb2-18"><a href="#cb2-18" tabindex="-1"></a>      <span class="at">weight       =</span> <span class="fl">1.2</span>  <span class="co"># categoria com mais dificuldade retorica</span></span>
 <span id="cb2-19"><a href="#cb2-19" tabindex="-1"></a>    ),</span>
 <span id="cb2-20"><a href="#cb2-20" tabindex="-1"></a>    <span class="at">neutro =</span> <span class="fu">list</span>(</span>
-<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Discurso tecnico ou processual, sem posicionamento claro.&quot;</span>,</span>
-<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;O relatorio incorporou emendas apresentadas.&quot;</span>),</span>
+<span id="cb2-21"><a href="#cb2-21" tabindex="-1"></a>      <span class="at">definition   =</span> <span class="st">&quot;Discurso técnico ou processual, sem posicionamento claro.&quot;</span>,</span>
+<span id="cb2-22"><a href="#cb2-22" tabindex="-1"></a>      <span class="at">examples_pos =</span> <span class="fu">c</span>(<span class="st">&quot;O relatório incorporou emendas apresentadas.&quot;</span>),</span>
 <span id="cb2-23"><a href="#cb2-23" tabindex="-1"></a>      <span class="at">examples_neg =</span> <span class="fu">c</span>(<span class="st">&quot;Sou totalmente contra esta proposta.&quot;</span>)</span>
 <span id="cb2-24"><a href="#cb2-24" tabindex="-1"></a>    )</span>
 <span id="cb2-25"><a href="#cb2-25" tabindex="-1"></a>  ),</span>
@@ -473,28 +473,28 @@ positivos e negativos para desambiguar categorias vizinhas.</p>
 <span id="cb2-33"><a href="#cb2-33" tabindex="-1"></a><span class="co">#&gt; • Categorias (3): &quot;favor&quot;, &quot;contra&quot;, and &quot;neutro&quot;</span></span>
 <span id="cb2-34"><a href="#cb2-34" tabindex="-1"></a><span class="co">#&gt; • Multilabel: FALSE</span></span>
 <span id="cb2-35"><a href="#cb2-35" tabindex="-1"></a><span class="co">#&gt; • Idioma: &quot;pt&quot;</span></span>
-<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="co">#&gt; • Criado em: 14/10/2026 15:46</span></span>
+<span id="cb2-36"><a href="#cb2-36" tabindex="-1"></a><span class="co">#&gt; • Criado em: 15/10/2026 16:43</span></span>
 <span id="cb2-37"><a href="#cb2-37" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb2-38"><a href="#cb2-38" tabindex="-1"></a><span class="co">#&gt; Instrução geral:</span></span>
-<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt; Classifique a posicao do parlamentar sobre a reforma tributaria com base no</span></span>
+<span id="cb2-39"><a href="#cb2-39" tabindex="-1"></a><span class="co">#&gt; Classifique a posicao do parlamentar sobre a reforma tributária com base no</span></span>
 <span id="cb2-40"><a href="#cb2-40" tabindex="-1"></a><span class="co">#&gt; discurso apresentado.</span></span>
 <span id="cb2-41"><a href="#cb2-41" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb2-42"><a href="#cb2-42" tabindex="-1"></a><span class="co">#&gt; Categorias:</span></span>
-<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a><span class="co">#&gt; • &quot;favor&quot;: Apoio explicito a aprovacao da reforma tributaria.</span></span>
+<span id="cb2-43"><a href="#cb2-43" tabindex="-1"></a><span class="co">#&gt; • &quot;favor&quot;: Apoio explicito a aprovacao da reforma tributária.</span></span>
 <span id="cb2-44"><a href="#cb2-44" tabindex="-1"></a><span class="co">#&gt; Ex+: Sou a favor desta reforma que simplifica o sistema.</span></span>
 <span id="cb2-45"><a href="#cb2-45" tabindex="-1"></a><span class="co">#&gt; • &quot;contra&quot; [peso: 1.2]: Oposicao explicita a reforma, com argumentos de</span></span>
 <span id="cb2-46"><a href="#cb2-46" tabindex="-1"></a><span class="co">#&gt; rejeicao.</span></span>
 <span id="cb2-47"><a href="#cb2-47" tabindex="-1"></a><span class="co">#&gt; Ex+: Voto contra: prejudica os trabalhadores.</span></span>
-<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a><span class="co">#&gt; • &quot;neutro&quot;: Discurso tecnico ou processual, sem posicionamento claro.</span></span>
-<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a><span class="co">#&gt; Ex+: O relatorio incorporou emendas apresentadas.</span></span></code></pre></div>
+<span id="cb2-48"><a href="#cb2-48" tabindex="-1"></a><span class="co">#&gt; • &quot;neutro&quot;: Discurso técnico ou processual, sem posicionamento claro.</span></span>
+<span id="cb2-49"><a href="#cb2-49" tabindex="-1"></a><span class="co">#&gt; Ex+: O relatório incorporou emendas apresentadas.</span></span></code></pre></div>
 <p>Salvar o codebook em YAML permite versionamento em Git e retomada da
 análise em outra sessão:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>arquivo_cb <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.yaml&quot;</span>)</span>
 <span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">ac_qual_save_codebook</span>(cb, <span class="at">path =</span> arquivo_cb)</span>
 <span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; ✅ Codebook salvo em</span></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; &#39;C:\Users\ander\AppData\Local\Temp\RtmpCIDK8A\file9f2c282f7da0.yaml&#39;</span></span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co">#&gt; &#39;C:\Users\ander\AppData\Local\Temp\RtmpSEA2e7\file8ac8706e4590.yaml&#39;</span></span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">&quot;Codebook salvo em:&quot;</span>, arquivo_cb, <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; Codebook salvo em: C:\Users\ander\AppData\Local\Temp\RtmpCIDK8A\file9f2c282f7da0.yaml</span></span></code></pre></div>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a><span class="co">#&gt; Codebook salvo em: C:\Users\ander\AppData\Local\Temp\RtmpSEA2e7\file8ac8706e4590.yaml</span></span></code></pre></div>
 </div>
 <div id="classificação-com-live-view" class="section level2">
 <h2>3. Classificação com live view</h2>
@@ -532,11 +532,11 @@ hora:</p>
 <span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>    <span class="st">&quot;&#39;Aprovo&#39; e &#39;conquista&#39; marcam adesao.&quot;</span>,</span>
 <span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a>    <span class="st">&quot;&#39;Rejeito&#39; e &#39;retrocesso&#39; marcam oposicao.&quot;</span>,</span>
 <span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a>    <span class="st">&quot;&#39;Voto contra&#39; e argumento distributivo.&quot;</span>,</span>
-<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>    <span class="st">&quot;&#39;Sou contrario&#39; com justificativa.&quot;</span>,</span>
-<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>    <span class="st">&quot;&#39;Nao apoio&#39; + pede revisao (borderline neutro/contra).&quot;</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a>    <span class="st">&quot;&#39;Sou contrário&#39; com justificativa.&quot;</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a>    <span class="st">&quot;&#39;Não apoio&#39; + pede revisao (borderline neutro/contra).&quot;</span>,</span>
 <span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a>    <span class="st">&quot;Descreve alteracao normativa sem posicionar.&quot;</span>,</span>
 <span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>    <span class="st">&quot;Descreve processo legislativo.&quot;</span>,</span>
-<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>    <span class="st">&quot;Numeros do resultado, sem opiniao. Borderline.&quot;</span>,</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>    <span class="st">&quot;Números do resultado, sem opiniao. Borderline.&quot;</span>,</span>
 <span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>    <span class="st">&quot;Encaminhamento processual.&quot;</span></span>
 <span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  )</span>
 <span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>)</span>
@@ -550,11 +550,11 @@ hora:</p>
 <span id="cb6-30"><a href="#cb6-30" tabindex="-1"></a><span class="co">#&gt;  4 d04    favor                 1    &#39;Aprovo&#39; e &#39;conquista&#39; marcam adesao.      </span></span>
 <span id="cb6-31"><a href="#cb6-31" tabindex="-1"></a><span class="co">#&gt;  5 d05    contra                1    &#39;Rejeito&#39; e &#39;retrocesso&#39; marcam oposicao.  </span></span>
 <span id="cb6-32"><a href="#cb6-32" tabindex="-1"></a><span class="co">#&gt;  6 d06    contra                1    &#39;Voto contra&#39; e argumento distributivo.    </span></span>
-<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="co">#&gt;  7 d07    contra                1    &#39;Sou contrario&#39; com justificativa.         </span></span>
-<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="co">#&gt;  8 d08    contra                0.67 &#39;Nao apoio&#39; + pede revisao (borderline neu…</span></span>
+<span id="cb6-33"><a href="#cb6-33" tabindex="-1"></a><span class="co">#&gt;  7 d07    contra                1    &#39;Sou contrário&#39; com justificativa.         </span></span>
+<span id="cb6-34"><a href="#cb6-34" tabindex="-1"></a><span class="co">#&gt;  8 d08    contra                0.67 &#39;Não apoio&#39; + pede revisao (borderline neu…</span></span>
 <span id="cb6-35"><a href="#cb6-35" tabindex="-1"></a><span class="co">#&gt;  9 d09    neutro                1    Descreve alteracao normativa sem posiciona…</span></span>
 <span id="cb6-36"><a href="#cb6-36" tabindex="-1"></a><span class="co">#&gt; 10 d10    neutro                1    Descreve processo legislativo.             </span></span>
-<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="co">#&gt; 11 d11    neutro                0.67 Numeros do resultado, sem opiniao. Borderl…</span></span>
+<span id="cb6-37"><a href="#cb6-37" tabindex="-1"></a><span class="co">#&gt; 11 d11    neutro                0.67 Números do resultado, sem opiniao. Borderl…</span></span>
 <span id="cb6-38"><a href="#cb6-38" tabindex="-1"></a><span class="co">#&gt; 12 d12    neutro                1    Encaminhamento processual.</span></span></code></pre></div>
 <p>Distribuição dos resultados:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>resultado <span class="sc">|&gt;</span></span>
@@ -575,29 +575,34 @@ humana):</p>
 <span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt;   doc_id categoria confidence_score reasoning                                   </span></span>
 <span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;                                       </span></span>
 <span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; 1 d03    favor                 0.67 Voto declarado, mas ambivalente entre favor…</span></span>
-<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; 2 d08    contra                0.67 &#39;Nao apoio&#39; + pede revisao (borderline neut…</span></span>
-<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; 3 d11    neutro                0.67 Numeros do resultado, sem opiniao. Borderli…</span></span></code></pre></div>
+<span id="cb8-8"><a href="#cb8-8" tabindex="-1"></a><span class="co">#&gt; 2 d08    contra                0.67 &#39;Não apoio&#39; + pede revisao (borderline neut…</span></span>
+<span id="cb8-9"><a href="#cb8-9" tabindex="-1"></a><span class="co">#&gt; 3 d11    neutro                0.67 Números do resultado, sem opiniao. Borderli…</span></span></code></pre></div>
 </div>
 <div id="amostra-para-revisão-humana" class="section level2">
 <h2>4. Amostra para revisão humana</h2>
-<p><code>ac_qual_sample(strategy = &quot;uncertainty&quot;)</code> prioriza
-documentos com menor <code>confidence_score</code> — foca o esforço
-humano onde o LLM mais errou.</p>
+<p>Para <strong>estimar a confiabilidade</strong> que vai para o artigo,
+a amostra precisa ser representativa do corpus (Krippendorff, 2018, cap.
+12): use <code>strategy = &quot;random&quot;</code> (padrão) ou
+<code>&quot;proportional&quot;</code>. A estratégia <code>&quot;uncertainty&quot;</code>,
+que prioriza documentos com menor <code>confidence_score</code>, é útil
+para outra coisa: <strong>diagnosticar erros</strong> e refinar o
+codebook. A concordância calculada nela não representa o corpus, porque
+a amostra foi escolhida justamente entre os casos difíceis.</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>amostra <span class="ot">&lt;-</span> <span class="fu">ac_qual_sample</span>(</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  resultado,</span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="at">n        =</span> <span class="dv">4</span>,</span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">strategy =</span> <span class="st">&quot;uncertainty&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>  <span class="at">strategy =</span> <span class="st">&quot;random&quot;</span></span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>)</span>
-<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; ℹ Amostra de 4 documentos selecionada (estratégia: &quot;uncertainty&quot;).</span></span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; ℹ Amostra de 4 documentos selecionada (estratégia: &quot;random&quot;).</span></span>
 <span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; ℹ Use `ac_qual_export_for_review()` para exportar para Excel.</span></span>
 <span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a>amostra <span class="sc">|&gt;</span> dplyr<span class="sc">::</span><span class="fu">select</span>(doc_id, categoria, confidence_score, sample_reason)</span>
 <span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 × 4</span></span>
-<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt;   doc_id categoria confidence_score sample_reason                </span></span>
-<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;                        </span></span>
-<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; 1 d03    favor                 0.67 uncertainty (confidence=0.67)</span></span>
-<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; 2 d08    contra                0.67 uncertainty (confidence=0.67)</span></span>
-<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; 3 d11    neutro                0.67 uncertainty (confidence=0.67)</span></span>
-<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; 4 d01    favor                 1    uncertainty (confidence=1)</span></span></code></pre></div>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="co">#&gt;   doc_id categoria confidence_score sample_reason</span></span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                &lt;dbl&gt; &lt;chr&gt;        </span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a><span class="co">#&gt; 1 d01    favor                    1 random       </span></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a><span class="co">#&gt; 2 d05    contra                   1 random       </span></span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="co">#&gt; 3 d12    neutro                   1 random       </span></span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; 4 d09    neutro                   1 random</span></span></code></pre></div>
 <p>Em uma rodada real, você exportaria essa amostra para Excel, um
 codificador humano preencheria a coluna <code>categoria_humano</code>, e
 o resultado seria reimportado:</p>
@@ -608,12 +613,12 @@ o resultado seria reimportado:</p>
 <div id="confiabilidade-inter-codificador" class="section level2">
 <h2>5. Confiabilidade inter-codificador</h2>
 <p>Simulamos a revisão humana (com 1 discordância em 12) e calculamos as
-métricas de concordância — no artigo, essas métricas aparecem na seção
-de método:</p>
+métricas de concordância: no artigo, essas métricas aparecem na seção de
+método:</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>humano <span class="ot">&lt;-</span> tibble<span class="sc">::</span><span class="fu">tibble</span>(</span>
 <span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>  <span class="at">doc_id    =</span> resultado<span class="sc">$</span>doc_id,</span>
 <span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a>  <span class="at">categoria =</span> <span class="fu">c</span>(<span class="fu">rep</span>(<span class="st">&quot;favor&quot;</span>, <span class="dv">4</span>), <span class="fu">rep</span>(<span class="st">&quot;contra&quot;</span>, <span class="dv">4</span>),</span>
-<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>                <span class="st">&quot;neutro&quot;</span>,<span class="st">&quot;neutro&quot;</span>,<span class="st">&quot;favor&quot;</span>,<span class="st">&quot;neutro&quot;</span>)  <span class="co"># 1 discordancia</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a>                <span class="st">&quot;neutro&quot;</span>,<span class="st">&quot;neutro&quot;</span>,<span class="st">&quot;favor&quot;</span>,<span class="st">&quot;neutro&quot;</span>)  <span class="co"># 1 discordância</span></span>
 <span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>)</span>
 <span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a></span>
 <span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a>irr <span class="ot">&lt;-</span> <span class="fu">ac_qual_reliability</span>(</span>
@@ -622,233 +627,57 @@ de método:</p>
 <span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a>  <span class="at">bootstrap =</span> <span class="dv">100</span><span class="dt">L</span></span>
 <span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a>)</span>
 <span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; Calculando confiabilidade em 12 documentos comuns...</span></span>
-<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(mat, method = &quot;nominal&quot;): NAs introduzidos por</span></span>
-<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt; coerção</span></span>
-<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-24"><a href="#cb11-24" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-25"><a href="#cb11-25" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-26"><a href="#cb11-26" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-27"><a href="#cb11-27" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-28"><a href="#cb11-28" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-29"><a href="#cb11-29" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-30"><a href="#cb11-30" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-31"><a href="#cb11-31" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-32"><a href="#cb11-32" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-33"><a href="#cb11-33" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-34"><a href="#cb11-34" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-35"><a href="#cb11-35" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-36"><a href="#cb11-36" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-37"><a href="#cb11-37" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-38"><a href="#cb11-38" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-39"><a href="#cb11-39" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-40"><a href="#cb11-40" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-41"><a href="#cb11-41" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-42"><a href="#cb11-42" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-43"><a href="#cb11-43" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-44"><a href="#cb11-44" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-45"><a href="#cb11-45" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-46"><a href="#cb11-46" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-47"><a href="#cb11-47" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-48"><a href="#cb11-48" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-49"><a href="#cb11-49" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-50"><a href="#cb11-50" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-51"><a href="#cb11-51" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-52"><a href="#cb11-52" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-53"><a href="#cb11-53" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-54"><a href="#cb11-54" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-55"><a href="#cb11-55" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-56"><a href="#cb11-56" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-57"><a href="#cb11-57" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-58"><a href="#cb11-58" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-59"><a href="#cb11-59" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-60"><a href="#cb11-60" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-61"><a href="#cb11-61" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-62"><a href="#cb11-62" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-63"><a href="#cb11-63" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-64"><a href="#cb11-64" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-65"><a href="#cb11-65" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-66"><a href="#cb11-66" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-67"><a href="#cb11-67" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-68"><a href="#cb11-68" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-69"><a href="#cb11-69" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-70"><a href="#cb11-70" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-71"><a href="#cb11-71" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-72"><a href="#cb11-72" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-73"><a href="#cb11-73" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-74"><a href="#cb11-74" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-75"><a href="#cb11-75" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-76"><a href="#cb11-76" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-77"><a href="#cb11-77" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-78"><a href="#cb11-78" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-79"><a href="#cb11-79" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-80"><a href="#cb11-80" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-81"><a href="#cb11-81" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-82"><a href="#cb11-82" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-83"><a href="#cb11-83" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-84"><a href="#cb11-84" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-85"><a href="#cb11-85" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-86"><a href="#cb11-86" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-87"><a href="#cb11-87" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-88"><a href="#cb11-88" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-89"><a href="#cb11-89" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-90"><a href="#cb11-90" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-91"><a href="#cb11-91" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-92"><a href="#cb11-92" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-93"><a href="#cb11-93" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-94"><a href="#cb11-94" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-95"><a href="#cb11-95" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-96"><a href="#cb11-96" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-97"><a href="#cb11-97" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-98"><a href="#cb11-98" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-99"><a href="#cb11-99" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-100"><a href="#cb11-100" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-101"><a href="#cb11-101" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-102"><a href="#cb11-102" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-103"><a href="#cb11-103" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-104"><a href="#cb11-104" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-105"><a href="#cb11-105" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-106"><a href="#cb11-106" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-107"><a href="#cb11-107" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-108"><a href="#cb11-108" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-109"><a href="#cb11-109" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-110"><a href="#cb11-110" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-111"><a href="#cb11-111" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-112"><a href="#cb11-112" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-113"><a href="#cb11-113" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-114"><a href="#cb11-114" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-115"><a href="#cb11-115" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-116"><a href="#cb11-116" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-117"><a href="#cb11-117" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-118"><a href="#cb11-118" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-119"><a href="#cb11-119" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-120"><a href="#cb11-120" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-121"><a href="#cb11-121" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-122"><a href="#cb11-122" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-123"><a href="#cb11-123" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-124"><a href="#cb11-124" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-125"><a href="#cb11-125" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-126"><a href="#cb11-126" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-127"><a href="#cb11-127" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-128"><a href="#cb11-128" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-129"><a href="#cb11-129" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-130"><a href="#cb11-130" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-131"><a href="#cb11-131" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-132"><a href="#cb11-132" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-133"><a href="#cb11-133" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-134"><a href="#cb11-134" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-135"><a href="#cb11-135" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-136"><a href="#cb11-136" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-137"><a href="#cb11-137" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-138"><a href="#cb11-138" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-139"><a href="#cb11-139" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-140"><a href="#cb11-140" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-141"><a href="#cb11-141" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-142"><a href="#cb11-142" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-143"><a href="#cb11-143" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-144"><a href="#cb11-144" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-145"><a href="#cb11-145" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-146"><a href="#cb11-146" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-147"><a href="#cb11-147" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-148"><a href="#cb11-148" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-149"><a href="#cb11-149" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-150"><a href="#cb11-150" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-151"><a href="#cb11-151" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-152"><a href="#cb11-152" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-153"><a href="#cb11-153" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-154"><a href="#cb11-154" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-155"><a href="#cb11-155" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-156"><a href="#cb11-156" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-157"><a href="#cb11-157" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-158"><a href="#cb11-158" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-159"><a href="#cb11-159" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-160"><a href="#cb11-160" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-161"><a href="#cb11-161" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-162"><a href="#cb11-162" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-163"><a href="#cb11-163" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-164"><a href="#cb11-164" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-165"><a href="#cb11-165" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-166"><a href="#cb11-166" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-167"><a href="#cb11-167" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-168"><a href="#cb11-168" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-169"><a href="#cb11-169" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-170"><a href="#cb11-170" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-171"><a href="#cb11-171" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-172"><a href="#cb11-172" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-173"><a href="#cb11-173" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-174"><a href="#cb11-174" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-175"><a href="#cb11-175" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-176"><a href="#cb11-176" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-177"><a href="#cb11-177" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-178"><a href="#cb11-178" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-179"><a href="#cb11-179" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-180"><a href="#cb11-180" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-181"><a href="#cb11-181" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-182"><a href="#cb11-182" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-183"><a href="#cb11-183" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-184"><a href="#cb11-184" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-185"><a href="#cb11-185" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-186"><a href="#cb11-186" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-187"><a href="#cb11-187" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-188"><a href="#cb11-188" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-189"><a href="#cb11-189" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-190"><a href="#cb11-190" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-191"><a href="#cb11-191" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-192"><a href="#cb11-192" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-193"><a href="#cb11-193" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-194"><a href="#cb11-194" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-195"><a href="#cb11-195" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-196"><a href="#cb11-196" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-197"><a href="#cb11-197" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-198"><a href="#cb11-198" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-199"><a href="#cb11-199" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-200"><a href="#cb11-200" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-201"><a href="#cb11-201" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-202"><a href="#cb11-202" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-203"><a href="#cb11-203" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-204"><a href="#cb11-204" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-205"><a href="#cb11-205" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-206"><a href="#cb11-206" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-207"><a href="#cb11-207" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-208"><a href="#cb11-208" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-209"><a href="#cb11-209" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-210"><a href="#cb11-210" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-211"><a href="#cb11-211" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-212"><a href="#cb11-212" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-213"><a href="#cb11-213" tabindex="-1"></a><span class="co">#&gt; Warning in irr::kripp.alpha(rbind(l, h), method = &quot;nominal&quot;): NAs introduzidos</span></span>
-<span id="cb11-214"><a href="#cb11-214" tabindex="-1"></a><span class="co">#&gt; por coerção</span></span>
-<span id="cb11-215"><a href="#cb11-215" tabindex="-1"></a><span class="co">#&gt; ℹ Interpretação baseada em Landis &amp; Koch (1977) e Gwet (2014).</span></span>
-<span id="cb11-216"><a href="#cb11-216" tabindex="-1"></a><span class="co">#&gt; ℹ IC 95% via bootstrap (n = 100).</span></span>
-<span id="cb11-217"><a href="#cb11-217" tabindex="-1"></a>irr</span>
-<span id="cb11-218"><a href="#cb11-218" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 × 5</span></span>
-<span id="cb11-219"><a href="#cb11-219" tabindex="-1"></a><span class="co">#&gt;   metric             estimate ci_lower ci_upper interpretation                  </span></span>
-<span id="cb11-220"><a href="#cb11-220" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;                           </span></span>
-<span id="cb11-221"><a href="#cb11-221" tabindex="-1"></a><span class="co">#&gt; 1 percent_agreement     0.917    0.75         1 excelente (&gt;= 90%)              </span></span>
-<span id="cb11-222"><a href="#cb11-222" tabindex="-1"></a><span class="co">#&gt; 2 krippendorff_alpha    0.880    0.584        1 quase perfeita (Landis &amp; Koch, …</span></span>
-<span id="cb11-223"><a href="#cb11-223" tabindex="-1"></a><span class="co">#&gt; 3 gwet_ac1              0.875    0.629        1 quase perfeita (Landis &amp; Koch, …</span></span>
-<span id="cb11-224"><a href="#cb11-224" tabindex="-1"></a><span class="co">#&gt; 4 f1_macro              0.915    0.625        1 quase perfeita (Landis &amp; Koch, …</span></span></code></pre></div>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; ℹ Interpretação: alfa por Krippendorff (2018); AC1 por Landis &amp; Koch (1977) e</span></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="co">#&gt;   Gwet (2014); percentual por Neuendorf (2017); F1 sem rótulo.</span></span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt; ℹ IC 95% via bootstrap (n = 100).</span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a>irr</span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt; # A tibble: 4 × 5</span></span>
+<span id="cb11-18"><a href="#cb11-18" tabindex="-1"></a><span class="co">#&gt;   metric             estimate ci_lower ci_upper interpretation                  </span></span>
+<span id="cb11-19"><a href="#cb11-19" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;                 &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;                           </span></span>
+<span id="cb11-20"><a href="#cb11-20" tabindex="-1"></a><span class="co">#&gt; 1 percent_agreement     0.917    0.75         1 alta (&gt;= 90%; Neuendorf, 2017)  </span></span>
+<span id="cb11-21"><a href="#cb11-21" tabindex="-1"></a><span class="co">#&gt; 2 krippendorff_alpha    0.880    0.584        1 confiável (&gt;= 0,800; Krippendor…</span></span>
+<span id="cb11-22"><a href="#cb11-22" tabindex="-1"></a><span class="co">#&gt; 3 gwet_ac1              0.875    0.629        1 quase perfeita (Landis &amp; Koch, …</span></span>
+<span id="cb11-23"><a href="#cb11-23" tabindex="-1"></a><span class="co">#&gt; 4 f1_macro              0.915    0.625        1 sem faixa canônica (não corrigi…</span></span></code></pre></div>
+<blockquote>
+<p><strong>Como ler esta tabela</strong></p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Onde olhar.</strong> Uma linha por métrica. Leia três
+colunas juntas: <code>estimate</code> (o valor), <code>ci_lower</code> e
+<code>ci_upper</code> (o intervalo de confiança: onde o valor verdadeiro
+provavelmente está) e <code>interpretation</code> (o rótulo, segundo a
+referência própria de cada métrica).</p></li>
+<li><p><strong>O que este exemplo mostra.</strong> Com 1 discordância em
+12 documentos, o <em>percent agreement</em> é ≈ 0,92. As métricas que
+descontam o acaso ficam um pouco abaixo: alfa de Krippendorff ≈ 0,88 e
+AC1 de Gwet ≈ 0,87. O alfa recebe o rótulo “confiável” (acima de 0,800),
+<strong>mas</strong> o intervalo dele vai de ≈ 0,58 a 1.</p></li>
+<li><p><strong>Em palavras simples.</strong> O valor pontual parece
+ótimo, mas com 12 documentos a incerteza é grande: o alfa verdadeiro
+pode estar abaixo do mínimo aceitável de 0,667.</p></li>
+<li><p><strong>Cuidado.</strong> O rótulo vem do valor pontual; a
+decisão deve olhar o intervalo. Krippendorff (2018, sec. 12.5) decide
+pela chance de o alfa estar abaixo do mínimo exigido, e aqui essa chance
+não é pequena. Com 12 documentos não dá para afirmar que a codificação é
+confiável: aumente a amostra (Neuendorf, 2017, sugere ao menos 50
+unidades). O exemplo usa só 100 réplicas <em>bootstrap</em> para rodar
+rápido; em uso real, deixe o padrão de 1000.</p></li>
+</ol>
+</blockquote>
 </div>
 <div id="relatório-de-método-replicabilidade-automática" class="section level2">
-<h2>6. Relatório de método — replicabilidade automática</h2>
+<h2>6. Relatório de método: replicabilidade automática</h2>
 <p>Aqui está o <strong>coração desta vignette</strong>:
-<code>ac_qual_report()</code> empacota tudo — codebook, config LLM,
-distribuição de resultados, métricas de IRR — em um documento único,
+<code>ac_qual_report()</code> empacota tudo (codebook, config LLM,
+distribuição de resultados, métricas de IRR) em um documento único,
 pronto para anexar como material suplementar de um artigo.</p>
-<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>arquivo_md <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">pattern =</span> <span class="st">&quot;relatorio-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.md&quot;</span>)</span>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>arquivo_md <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">pattern =</span> <span class="st">&quot;relatório-&quot;</span>, <span class="at">fileext =</span> <span class="st">&quot;.md&quot;</span>)</span>
 <span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a></span>
 <span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="fu">ac_qual_report</span>(</span>
 <span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="at">coded       =</span> resultado,</span>
 <span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>  <span class="at">codebook    =</span> cb,</span>
 <span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a>  <span class="at">reliability =</span> irr,</span>
 <span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a>  <span class="at">chat        =</span> <span class="st">&quot;anthropic/claude-sonnet-4-5&quot;</span>,  <span class="co"># ou objeto Chat</span></span>
-<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>  <span class="at">title       =</span> <span class="st">&quot;Classificacao de posicionamento na reforma tributaria&quot;</span>,</span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a>  <span class="at">title       =</span> <span class="st">&quot;Classificação de posicionamento na reforma tributária&quot;</span>,</span>
 <span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a>  <span class="at">author      =</span> <span class="st">&quot;Silva, A.; Souza, B.&quot;</span>,</span>
 <span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a>  <span class="at">method      =</span> <span class="st">&quot;Corpus de 12 pronunciamentos parlamentares (2023-2024).&quot;</span>,</span>
 <span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a>  <span class="at">format      =</span> <span class="st">&quot;md&quot;</span>,</span>
@@ -857,13 +686,13 @@ pronto para anexar como material suplementar de um artigo.</p>
 <span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>)</span>
 <span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a><span class="co">#&gt; Warning: Unknown or uninitialised column: `metrics`.</span></span>
 <span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a><span class="co">#&gt; ✔ Relatorio salvo em</span></span>
-<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt;   &#39;C:\Users\ander\AppData\Local\Temp\RtmpCIDK8A\relatorio-9f2c6d6f4d70.md&#39;</span></span></code></pre></div>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a><span class="co">#&gt;   &#39;C:\Users\ander\AppData\Local\Temp\RtmpSEA2e7\relatório-8ac8535a7d45.md&#39;</span></span></code></pre></div>
 <p>Primeiras 40 linhas do relatório gerado:</p>
 <div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a><span class="fu">cat</span>(<span class="fu">head</span>(<span class="fu">readLines</span>(arquivo_md), <span class="dv">40</span>), <span class="at">sep =</span> <span class="st">&quot;</span><span class="sc">\n</span><span class="st">&quot;</span>)</span>
-<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt; # Classificacao de posicionamento na reforma tributaria</span></span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="co">#&gt; # Classificação de posicionamento na reforma tributária</span></span>
 <span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; - **Gerado em:** 2026-10-14 15:46:55 -03</span></span>
-<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; - **Versao do acR:** 0.4.0</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; - **Gerado em:** 2026-10-15 16:43:56 -03</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; - **Versao do acR:** 0.6.0</span></span>
 <span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; - **Autor(es):** Silva, A.; Souza, B.</span></span>
 <span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; - **Metodo:** Corpus de 12 pronunciamentos parlamentares (2023-2024).</span></span>
 <span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; </span></span>
@@ -878,17 +707,17 @@ pronto para anexar como material suplementar de um artigo.</p>
 <span id="cb13-17"><a href="#cb13-17" tabindex="-1"></a><span class="co">#&gt; | Idioma        | `pt` |</span></span>
 <span id="cb13-18"><a href="#cb13-18" tabindex="-1"></a><span class="co">#&gt; | Modo        | `manual` |</span></span>
 <span id="cb13-19"><a href="#cb13-19" tabindex="-1"></a><span class="co">#&gt; | Multilabel  | `FALSE` |</span></span>
-<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt; | Criado em     | 2026-10-14 15:46:55 |</span></span>
+<span id="cb13-20"><a href="#cb13-20" tabindex="-1"></a><span class="co">#&gt; | Criado em     | 2026-10-15 16:43:55 |</span></span>
 <span id="cb13-21"><a href="#cb13-21" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb13-22"><a href="#cb13-22" tabindex="-1"></a><span class="co">#&gt; **Instrucoes ao codificador:**</span></span>
 <span id="cb13-23"><a href="#cb13-23" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="co">#&gt; &gt; Classifique a posicao do parlamentar sobre a reforma tributaria com base no discurso apresentado.</span></span>
+<span id="cb13-24"><a href="#cb13-24" tabindex="-1"></a><span class="co">#&gt; &gt; Classifique a posicao do parlamentar sobre a reforma tributária com base no discurso apresentado.</span></span>
 <span id="cb13-25"><a href="#cb13-25" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb13-26"><a href="#cb13-26" tabindex="-1"></a><span class="co">#&gt; </span><span class="al">###</span><span class="co"> Categorias</span></span>
 <span id="cb13-27"><a href="#cb13-27" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb13-28"><a href="#cb13-28" tabindex="-1"></a><span class="co">#&gt; #### `favor`</span></span>
 <span id="cb13-29"><a href="#cb13-29" tabindex="-1"></a><span class="co">#&gt; </span></span>
-<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a><span class="co">#&gt; **Definicao:** Apoio explicito a aprovacao da reforma tributaria.</span></span>
+<span id="cb13-30"><a href="#cb13-30" tabindex="-1"></a><span class="co">#&gt; **Definicao:** Apoio explicito a aprovacao da reforma tributária.</span></span>
 <span id="cb13-31"><a href="#cb13-31" tabindex="-1"></a><span class="co">#&gt; </span></span>
 <span id="cb13-32"><a href="#cb13-32" tabindex="-1"></a><span class="co">#&gt; **Exemplos positivos:**</span></span>
 <span id="cb13-33"><a href="#cb13-33" tabindex="-1"></a><span class="co">#&gt; - Sou a favor desta reforma que simplifica o sistema.</span></span>
@@ -921,12 +750,12 @@ publicação web):</p>
 <span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>corpus    <span class="ot">&lt;-</span> <span class="fu">ac_corpus</span>(meu_data_frame)</span>
 <span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>cb        <span class="ot">&lt;-</span> <span class="fu">ac_qual_codebook</span>(<span class="at">name =</span> <span class="st">&quot;...&quot;</span>, <span class="at">instructions =</span> <span class="st">&quot;...&quot;</span>, <span class="at">categories =</span> <span class="fu">list</span>(...))</span>
 <span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a>resultado <span class="ot">&lt;-</span> <span class="fu">ac_qual_code</span>(corpus, cb, <span class="at">chat =</span> <span class="fu">chat_anthropic</span>(<span class="st">&quot;...&quot;</span>), <span class="at">live =</span> <span class="st">&quot;terminal&quot;</span>)</span>
-<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>amostra   <span class="ot">&lt;-</span> <span class="fu">ac_qual_sample</span>(resultado, <span class="at">n =</span> <span class="dv">30</span>, <span class="at">strategy =</span> <span class="st">&quot;uncertainty&quot;</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a>amostra   <span class="ot">&lt;-</span> <span class="fu">ac_qual_sample</span>(resultado, <span class="at">n =</span> <span class="dv">30</span>)   <span class="co"># aleatória: representativa</span></span>
 <span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co"># ... revisao humana ...</span></span>
 <span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a>irr       <span class="ot">&lt;-</span> <span class="fu">ac_qual_reliability</span>(<span class="at">llm =</span> resultado, <span class="at">human =</span> revisado)</span>
 <span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="fu">ac_qual_report</span>(resultado, cb, <span class="at">reliability =</span> irr, <span class="at">path =</span> <span class="st">&quot;metodo.md&quot;</span>)</span></code></pre></div>
 <p>Seis funções principais, um pipeline reproduzível, um relatório
-automático — do texto bruto ao apêndice metodológico do artigo.</p>
+automático: do texto bruto ao apêndice metodológico do artigo.</p>
 </div>
 <div id="referências" class="section level2">
 <h2>Referências</h2>
@@ -935,8 +764,14 @@ automático — do texto bruto ao apêndice metodológico do artigo.</p>
 crowd workers for text-annotation tasks. <em>PNAS</em>, 120(30).</li>
 <li>Krippendorff, K. (2018). <em>Content Analysis: An Introduction to
 Its Methodology</em> (4th ed.). SAGE.</li>
-<li>Wang, X. et al. (2022). Self-consistency improves chain-of-thought
-reasoning in language models. <em>arXiv:2203.11171</em>.</li>
+<li>Landis, J. R.; Koch, G. G. (1977). The measurement of observer
+agreement for categorical data. <em>Biometrics</em>, 33(1),
+159-174.</li>
+<li>Neuendorf, K. A. (2017). <em>The Content Analysis Guidebook</em>
+(2nd ed.). SAGE.</li>
+<li>Wang, X. et al. (2023). Self-consistency improves chain of thought
+reasoning in language models. <em>International Conference on Learning
+Representations (ICLR)</em>.</li>
 </ul>
 </div>
 

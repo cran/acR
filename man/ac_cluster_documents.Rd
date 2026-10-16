@@ -2,7 +2,7 @@
 % Please edit documentation in R/ac_cluster.R
 \name{ac_cluster_documents}
 \alias{ac_cluster_documents}
-\title{Agrupamento nao supervisionado de documentos}
+\title{Agrupamento não supervisionado de documentos}
 \usage{
 ac_cluster_documents(
   corpus,
@@ -24,15 +24,23 @@ com ligacao Ward.D2; \code{"kmeans"} usa k-means com \code{nstart = 25L};
 \item{features}{Como representar cada documento. \code{"tfidf"} (padrao) pesa
 por TF-IDF; \code{"count"} usa contagens brutas.}
 
-\item{k}{Numero de grupos. Se \code{NULL} (padrao) e \code{method \%in\% c("hclust","kmeans")}, tenta escolher automaticamente por silhouette
-entre 2 e 8; requer \code{cluster}. Se \code{cluster} nao estiver instalado,
+\item{k}{Número de grupos. Se \code{NULL} (padrao) e \code{method \%in\% c("hclust","kmeans")}, tenta escolher automaticamente por silhouette
+entre 2 e 8; requer \code{cluster}. Se \code{cluster} não estiver instalado,
 \code{k = 3} e o fallback.}
 
-\item{distance}{Metrica de dissimilaridade. \code{"cosine"} (padrao) e o
-classico em textos; \code{"euclidean"} funciona melhor com vetores
-normalizados.}
+\item{distance}{Métrica de dissimilaridade. \code{"cosine"} (padrão) é o
+clássico em textos (Salton & McGill, 1983): compara a \emph{composição}
+do vocabulário, não o tamanho do documento. Internamente ela é
+calculada como distância de corda, \eqn{\sqrt{2(1 - \cos\theta)}},
+que é a distância euclidiana entre os vetores normalizados para
+norma 1 (Legendre & Legendre, 2012). A ordem dos pares é a mesma de
+\eqn{1 - \cos\theta}, mas a distância de corda é euclidiana, o que
+o critério de Ward (\code{hclust}) e o k-means exigem (Murtagh & Legendre,
+2014). Com \code{"cosine"}, o k-means também roda sobre os vetores
+normalizados. \code{"euclidean"} usa os vetores brutos, sensíveis ao
+tamanho do documento.}
 
-\item{min_docs}{Minimo de documentos para nao emitir warning de corpus
+\item{min_docs}{Mínimo de documentos para não emitir warning de corpus
 pequeno. Padrao: \code{15L}.}
 }
 \value{
@@ -40,21 +48,21 @@ Objeto de classe \code{ac_cluster} com:
 \describe{
 \item{\code{assignments}}{\code{tibble} com \code{doc_id} e \code{cluster} (integer).}
 \item{\code{fit}}{Objeto bruto do algoritmo (\code{hclust}, \code{kmeans} ou \code{pam}).}
-\item{\code{k}}{Numero final de grupos.}
+\item{\code{k}}{Número final de grupos.}
 \item{\code{method}, \code{features}, \code{distance}}{Parametros usados.}
-\item{\code{silhouette}}{Silhueta media (NA se \code{cluster} nao instalado).}
+\item{\code{silhouette}}{Silhueta média (NA se \code{cluster} não instalado).}
 \item{\code{dtm}}{Matriz documento-termo usada (para plotagem).}
 }
 }
 \description{
 \code{ac_cluster_documents()} particiona os documentos de um corpus em grupos
-"duros" (hard clustering) com base na similaridade de vocabulario. Serve
+"duros" (hard clustering) com base na similaridade de vocabulário. Serve
 para descobrir tipologias latentes, montar amostras estratificadas de
-revisao humana ou produzir dendrogramas para relatorios metodologicos.
+revisao humana ou produzir dendrogramas para relatórios metodologicos.
 
-Nao substitui \code{\link[=ac_lda]{ac_lda()}}: LDA e clustering \emph{soft} (cada documento vira
-uma mistura de topicos), enquanto esta funcao devolve \strong{uma etiqueta
-por documento}.
+Não substitui \code{\link[=ac_lda]{ac_lda()}}: o LDA é um modelo de pertencimento misto
+(cada documento vira uma mistura de tópicos), enquanto esta função
+devolve \strong{uma etiqueta por documento}.
 }
 \examples{
 # Corpus com dois blocos tematicos
@@ -64,16 +72,31 @@ df <- data.frame(
             "cidadania direitos participacao democracia",
             "voto direitos liberdade cidadania",
             "democracia voto participacao popular",
-            "mercado economia eficiencia privatizacao",
-            "privatizacao mercado livre eficiencia",
+            "mercado economia eficiência privatizacao",
+            "privatizacao mercado livre eficiência",
             "economia crescimento investimento mercado",
-            "eficiencia mercado economia livre"),
+            "eficiência mercado economia livre"),
   stringsAsFactors = FALSE
 )
 corpus <- ac_corpus(df, text = texto, docid = id)
 clust  <- ac_cluster_documents(corpus, k = 2)
 clust$assignments
 
+}
+\references{
+Legendre, P.; Legendre, L. (2012). \emph{Numerical Ecology} (3rd ed.).
+Elsevier.
+
+Murtagh, F.; Legendre, P. (2014). Ward's hierarchical agglomerative
+clustering method: Which algorithms implement Ward's criterion?
+\emph{Journal of Classification}, 31(3), 274-295.
+
+Rousseeuw, P. J. (1987). Silhouettes: a graphical aid to the
+interpretation and validation of cluster analysis. \emph{Journal of
+Computational and Applied Mathematics}, 20, 53-65.
+
+Salton, G.; McGill, M. J. (1983). \emph{Introduction to Modern Information
+Retrieval}. McGraw-Hill.
 }
 \seealso{
 \code{\link[=ac_lda]{ac_lda()}}, \code{\link[=ac_plot_cluster]{ac_plot_cluster()}}

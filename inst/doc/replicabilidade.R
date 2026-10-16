@@ -15,18 +15,18 @@ library(dplyr)
 df <- data.frame(
   doc_id = paste0("d", sprintf("%02d", 1:12)),
   text = c(
-    "Apoio integralmente esta reforma que simplifica o sistema tributario.",
+    "Apoio integralmente esta reforma que simplifica o sistema tributário.",
     "Sou favoravel a proposta: reduz distorcoes historicas do setor.",
     "Voto sim com plena adesao: precisamos modernizar a estrutura fiscal.",
-    "Aprovo a reforma tributaria, e uma conquista para o desenvolvimento.",
+    "Aprovo a reforma tributária, e uma conquista para o desenvolvimento.",
     "Rejeito esta proposta, e um retrocesso para os trabalhadores.",
     "Voto contra: a reforma prejudica os mais pobres e as pequenas empresas.",
-    "Sou contrario a essa proposta, ela beneficia apenas grandes corporacoes.",
-    "Nao apoio o texto atual, precisa de revisao profunda antes da votacao.",
+    "Sou contrário a essa proposta, ela beneficia apenas grandes corporacoes.",
+    "Não apoio o texto atual, precisa de revisao profunda antes da votacao.",
     "O texto substitutivo altera o artigo 145 da Constituicao Federal.",
-    "O relatorio incorporou 47 emendas apresentadas em plenario.",
+    "O relatório incorporou 47 emendas apresentadas em plenário.",
     "A comissao aprovou o parecer com 15 votos a favor e 8 contra.",
-    "O projeto seguira para votacao na proxima sessao ordinaria."
+    "O projeto seguira para votacao na próxima sessão ordinária."
   ),
   partido = c("PT","PSD","PL","MDB","PSOL","PT","PDT","PSOL",
               "MDB","PSDB","PL","MDB"),
@@ -40,12 +40,12 @@ corpus
 cb <- ac_qual_codebook(
   name         = "posicao_reforma_tributaria",
   instructions = paste(
-    "Classifique a posicao do parlamentar sobre a reforma tributaria",
+    "Classifique a posicao do parlamentar sobre a reforma tributária",
     "com base no discurso apresentado."
   ),
   categories = list(
     favor = list(
-      definition   = "Apoio explicito a aprovacao da reforma tributaria.",
+      definition   = "Apoio explicito a aprovacao da reforma tributária.",
       examples_pos = c("Sou a favor desta reforma que simplifica o sistema."),
       examples_neg = c("O texto altera o artigo 145 da Constituicao Federal."),
       weight       = 1
@@ -57,8 +57,8 @@ cb <- ac_qual_codebook(
       weight       = 1.2  # categoria com mais dificuldade retorica
     ),
     neutro = list(
-      definition   = "Discurso tecnico ou processual, sem posicionamento claro.",
-      examples_pos = c("O relatorio incorporou emendas apresentadas."),
+      definition   = "Discurso técnico ou processual, sem posicionamento claro.",
+      examples_pos = c("O relatório incorporou emendas apresentadas."),
       examples_neg = c("Sou totalmente contra esta proposta.")
     )
   ),
@@ -87,11 +87,11 @@ resultado <- tibble::tibble(
     "'Aprovo' e 'conquista' marcam adesao.",
     "'Rejeito' e 'retrocesso' marcam oposicao.",
     "'Voto contra' e argumento distributivo.",
-    "'Sou contrario' com justificativa.",
-    "'Nao apoio' + pede revisao (borderline neutro/contra).",
+    "'Sou contrário' com justificativa.",
+    "'Não apoio' + pede revisao (borderline neutro/contra).",
     "Descreve alteracao normativa sem posicionar.",
     "Descreve processo legislativo.",
-    "Numeros do resultado, sem opiniao. Borderline.",
+    "Números do resultado, sem opiniao. Borderline.",
     "Encaminhamento processual."
   )
 )
@@ -111,7 +111,7 @@ resultado |>
 amostra <- ac_qual_sample(
   resultado,
   n        = 4,
-  strategy = "uncertainty"
+  strategy = "random"
 )
 amostra |> dplyr::select(doc_id, categoria, confidence_score, sample_reason)
 
@@ -124,7 +124,7 @@ amostra |> dplyr::select(doc_id, categoria, confidence_score, sample_reason)
 humano <- tibble::tibble(
   doc_id    = resultado$doc_id,
   categoria = c(rep("favor", 4), rep("contra", 4),
-                "neutro","neutro","favor","neutro")  # 1 discordancia
+                "neutro","neutro","favor","neutro")  # 1 discordância
 )
 
 irr <- ac_qual_reliability(
@@ -135,14 +135,14 @@ irr <- ac_qual_reliability(
 irr
 
 ## ----report-------------------------------------------------------------------
-arquivo_md <- tempfile(pattern = "relatorio-", fileext = ".md")
+arquivo_md <- tempfile(pattern = "relatório-", fileext = ".md")
 
 ac_qual_report(
   coded       = resultado,
   codebook    = cb,
   reliability = irr,
   chat        = "anthropic/claude-sonnet-4-5",  # ou objeto Chat
-  title       = "Classificacao de posicionamento na reforma tributaria",
+  title       = "Classificação de posicionamento na reforma tributária",
   author      = "Silva, A.; Souza, B.",
   method      = "Corpus de 12 pronunciamentos parlamentares (2023-2024).",
   format      = "md",

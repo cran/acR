@@ -11,6 +11,21 @@ knitr::opts_chunk$set(
   dpi        = 140
 )
 library(acR)
+# ac_sentiment() baixa o OpLexicon (GitHub) na primeira execução e guarda
+# em cache. Sem acesso a ele, os trechos que dependem do léxico não rodam,
+# em vez de interromper a vignette com erro.
+tem_lexico <- tryCatch({
+  suppressMessages(ac_sentiment(ac_corpus(data.frame(text = "bom"))))
+  TRUE
+}, error = function(e) FALSE)
+
+## ----aviso-lexico, echo=FALSE, results="asis", eval=!tem_lexico---------------
+# cat(
+#   "> **Aviso:** o léxico OpLexicon não pôde ser baixado ao gerar esta",
+#   "> página (sem acesso à internet), então os trechos que dependem dele",
+#   "> não foram executados. Rode a vignette com internet para ver as saídas.",
+#   sep = "\n"
+# )
 
 ## ----pkg----------------------------------------------------------------------
 library(acR)
@@ -48,18 +63,18 @@ df <- data.frame(
 corpus <- ac_corpus(df)
 corpus
 
-## ----sentiment----------------------------------------------------------------
+## ----sentiment, eval=tem_lexico-----------------------------------------------
 sent <- ac_sentiment(corpus)
 sent
 
-## ----validacao----------------------------------------------------------------
+## ----validacao, eval=tem_lexico-----------------------------------------------
 sent |>
   dplyr::left_join(df |> dplyr::mutate(doc_id = paste0("doc_", dplyr::row_number())),
                    by = "doc_id") |>
   dplyr::count(posicao, sentiment) |>
   tidyr::pivot_wider(names_from = sentiment, values_from = n, values_fill = 0L)
 
-## ----metodos------------------------------------------------------------------
+## ----metodos, eval=tem_lexico-------------------------------------------------
 sent_sum   <- ac_sentiment(corpus, method = "sum")
 sent_mean  <- ac_sentiment(corpus, method = "mean")
 sent_ratio <- ac_sentiment(corpus, method = "ratio")
@@ -72,7 +87,7 @@ comparacao <- data.frame(
 )
 head(comparacao, 10)
 
-## ----plot-bar, fig.height=6---------------------------------------------------
+## ----plot-bar, eval=tem_lexico, fig.height=6----------------------------------
 ac_plot_sentiment(sent, type = "bar") +
   ggplot2::labs(
     title    = "Sentimento por documento",
@@ -80,21 +95,35 @@ ac_plot_sentiment(sent, type = "bar") +
     caption  = "acR - ac_plot_sentiment(type = \"bar\")"
   )
 
-## ----plot-density, fig.height=5-----------------------------------------------
+## ----plot-density, eval=tem_lexico, fig.height=5------------------------------
 ac_plot_sentiment(sent, type = "density") +
   ggplot2::labs(
     title    = "Distribuição de scores de sentimento",
-    subtitle = "Bimodalidade sugere polarização; unimodal sugere consenso"
+    subtitle = "Curvas separadas pelo sinal do escore (veja a nota abaixo)"
   )
 
-## ----plot-line, fig.height=5--------------------------------------------------
-ac_plot_sentiment(sent, type = "line") +
+## ----plot-hist, eval=tem_lexico, fig.height=4---------------------------------
+ggplot2::ggplot(sent, ggplot2::aes(x = score)) +
+  ggplot2::geom_histogram(binwidth = 1, fill = "grey60", color = "white") +
+  ggplot2::geom_vline(xintercept = 0, linetype = "dashed", color = "grey40") +
+  ggplot2::labs(
+    title    = "Distribuição de todos os escores",
+    subtitle = "Uma única distribuição: é aqui que se avalia polarização",
+    x = "Score", y = "Documentos"
+  ) +
+  ggplot2::theme_minimal()
+
+## ----plot-line, eval=tem_lexico, fig.height=5---------------------------------
+sent_ordenado <- sent
+sent_ordenado$doc_id <- factor(sent_ordenado$doc_id, levels = paste0("doc_", 1:14))
+
+ac_plot_sentiment(sent_ordenado, type = "line") +
   ggplot2::labs(
     title    = "Sentimento ao longo dos documentos (ordem de entrada)",
-    subtitle = "Substitua a ordem por data em corpora reais"
+    subtitle = "doc_id reordenado explicitamente como factor (ver texto)"
   )
 
-## ----por-partido--------------------------------------------------------------
+## ----por-partido, eval=tem_lexico---------------------------------------------
 por_partido <- sent |>
   dplyr::left_join(df |> dplyr::mutate(doc_id = paste0("doc_", dplyr::row_number())),
                    by = "doc_id") |>
@@ -112,7 +141,7 @@ por_partido <- sent |>
 
 por_partido
 
-## ----plot-partidos, fig.height=6----------------------------------------------
+## ----plot-partidos, eval=tem_lexico, fig.height=6-----------------------------
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   ggplot2::ggplot(
     por_partido,
@@ -139,7 +168,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
 }
 
 ## ----plot-xray, fig.height=5--------------------------------------------------
-ac_plot_xray(corpus, terms = c("reforma", "trabalhadores", "aprovar", "vergonha")) +
+ac_plot_xray(corpus, terms = c("reforma", "trabalhadores", "proposta")) +
   ggplot2::labs(
     title    = "Onde os termos-chave aparecem no corpus",
     subtitle = "Cada ponto marca uma ocorrência do termo (posição relativa no texto)"

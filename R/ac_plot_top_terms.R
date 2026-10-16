@@ -2,23 +2,23 @@
 #'
 #' @description
 #' `ac_plot_top_terms()` cria um grafico de barras com os termos mais
-#' frequentes a partir de uma tabela de frequencias, tipicamente gerada
+#' frequentes a partir de uma tabela de frequências, tipicamente gerada
 #' por [`ac_count()`] ou filtrada por [`ac_top_terms()`].
 #'
-#' A funcao usa [ggplot2][ggplot2::ggplot2] como base e pode, opcionalmente, aplicar o
+#' A função usa [ggplot2][ggplot2::ggplot2] como base e pode, opcionalmente, aplicar o
 #' estilo editorial do pacote `ipeaplot`.
 #'
-#' @param x Um `data.frame` ou [`tibble::tibble()`] contendo, no minimo,
+#' @param x Um `data.frame` ou [`tibble::tibble()`] contendo, no mínimo,
 #'   as colunas `token` e `n`.
 #' @param by Vetor de nomes de colunas em `x` a serem usados como grupos
-#'   de facetas. Se `NULL` (padrao), produz um unico grafico. Se nao for
+#'   de facetas. Se `NULL` (padrao), produz um único grafico. Se não for
 #'   `NULL`, cria facetas por combinacao das colunas informadas.
-#' @param n Numero de termos a exibir. Se `NULL` (padrao), usa todas as
+#' @param n Número de termos a exibir. Se `NULL` (padrao), usa todas as
 #'   linhas de `x`. Se informado, seleciona os top `n` termos no geral
 #'   ou em cada grupo definido por `by`.
 #' @param style Estilo grafico. Pode ser `"default"` (padrao) ou `"ipea"`.
-#'   Quando `"ipea"`, a funcao tenta aplicar `ipeaplot::theme_ipea()`.
-#' @param flip Logico. Se `TRUE` (padrao), usa barras horizontais com
+#'   Quando `"ipea"`, a função tenta aplicar `ipeaplot::theme_ipea()`.
+#' @param flip Lógico. Se `TRUE` (padrao), usa barras horizontais com
 #'   [`ggplot2::coord_flip()`].
 #'
 #' @return Um objeto `ggplot`.
@@ -106,10 +106,14 @@ ac_plot_top_terms <- function(
   
   df_plot <- tibble::as_tibble(x)
   
+  # Com coord_flip(), o primeiro nivel do fator fica embaixo; invertendo,
+  # o termo mais frequente aparece no topo (leitura de cima para baixo).
+  ordem <- function(tk) if (isTRUE(flip)) rev(unique(tk)) else unique(tk)
+
   if (is.null(by)) {
     df_plot <- df_plot |>
       dplyr::arrange(dplyr::desc(n), token) |>
-      dplyr::mutate(token = factor(token, levels = unique(token)))
+      dplyr::mutate(token = factor(token, levels = ordem(token)))
   } else {
     facet_col <- "__facet_group__"
     df_plot[[facet_col]] <- do.call(paste, c(df_plot[by], sep = " | "))
@@ -117,7 +121,7 @@ ac_plot_top_terms <- function(
     df_plot <- df_plot |>
       dplyr::group_by(.data[[facet_col]]) |>
       dplyr::arrange(dplyr::desc(n), token, .by_group = TRUE) |>
-      dplyr::mutate(token = factor(token, levels = unique(token))) |>
+      dplyr::mutate(token = factor(token, levels = ordem(token))) |>
       dplyr::ungroup()
   }
   

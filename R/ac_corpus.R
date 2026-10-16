@@ -13,7 +13,7 @@
 #' @param text Nome da coluna de texto, sem aspas (usa *tidyselect* /
 #'   *non-standard evaluation*). Apenas relevante quando `data` é um
 #'   `data.frame`. Se `NULL` (padrão), a função tenta detectar automaticamente
-#'   uma coluna chamada `text`, `texto`, `doc`, `content` ou `conteudo`.
+#'   uma coluna chamada `text`, `texto`, `doc`, `content` ou `conteúdo`.
 #' @param docid Nome da coluna de identificador único, sem aspas. Se `NULL`
 #'   (padrão), gera IDs sequenciais no formato `doc_1`, `doc_2`, ...
 #' @param meta Colunas de metadados a preservar, via *tidyselect* (ex:
@@ -42,7 +42,7 @@
 #' 5. `doc_id` não pode conter `NA`.
 #'
 #' Documentos com texto vazio ou `NA` geram aviso (`warning`) mas são
-#' mantidos no corpus com texto `""` — o usuário decide se filtra depois.
+#' mantidos no corpus com texto `""`: o usuário decide se filtra depois.
 #'
 #' @examples
 #' # A partir de um data.frame

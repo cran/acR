@@ -7,28 +7,32 @@
 ac_top_terms(x, n = 20L, by = NULL, sort = TRUE)
 }
 \arguments{
-\item{x}{Um \code{data.frame} ou \code{\link[tibble:tibble]{tibble::tibble()}} contendo, no minimo,
+\item{x}{Um \code{data.frame} ou \code{\link[tibble:tibble]{tibble::tibble()}} contendo, no mínimo,
 as colunas \code{token} e \code{n}. Em geral, o resultado de \code{\link[=ac_count]{ac_count()}}.}
 
-\item{n}{Numero de termos a selecionar. Valor inteiro >= 1.}
+\item{n}{Número de termos a selecionar. Valor inteiro >= 1.}
 
 \item{by}{Vetor de nomes de colunas em \code{x} a serem usados como grupos
 de agregacao. Se \code{NULL} (padrao), a selecao e feita no conjunto total.
-Se nao for \code{NULL}, os \code{n} termos mais frequentes sao selecionados
+Se não for \code{NULL}, os \code{n} termos mais frequentes sao selecionados
 dentro de cada combinacao de \code{by}.}
 
-\item{sort}{Logico. Se \code{TRUE} (padrao), ordena a saida em ordem
-decrescente de frequencia (\code{n}). Se \code{FALSE}, preserva a ordem
-retornada pela operacao interna de selecao, apenas garantindo que
-os grupos (quando houver) venham juntos.}
+\item{sort}{Lógico. Se \code{TRUE} (padrão), ordena a saída em ordem
+decrescente de frequência (\code{n}). Se \code{FALSE}, ordena os termos
+selecionados alfabeticamente (dentro de cada grupo, quando houver).}
 }
 \value{
-Um \code{\link[tibble:tibble]{tibble::tibble()}} com as mesmas colunas de \code{x}, mas
-restrito aos \code{n} termos mais frequentes (no geral ou por grupo).
+Um \code{\link[tibble:tibble]{tibble::tibble()}} com as colunas \code{token} e \code{n} (mais as
+colunas de \code{by}, se houver), com exatamente \code{n} termos (ou menos, se
+o vocabulário for menor) no geral ou por grupo. A frequência de cada
+termo é \strong{somada} sobre os documentos (ou dentro de cada grupo), de
+modo que uma tabela por documento, saída padrão de \code{\link[=ac_count]{ac_count()}},
+dá o total do corpus. Empates na última posição são desfeitos em
+ordem alfabética.
 }
 \description{
 \code{ac_top_terms()} seleciona os \code{n} termos mais frequentes a partir de uma
-tabela de frequencias (tipicamente o resultado de \code{\link[=ac_count]{ac_count()}}).
+tabela de frequências (tipicamente o resultado de \code{\link[=ac_count]{ac_count()}}).
 
 Pode operar em dois modos:
 \itemize{

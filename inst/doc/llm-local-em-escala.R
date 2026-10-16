@@ -48,9 +48,9 @@ knitr::opts_chunk$set(
 ## -----------------------------------------------------------------------------
 # table(coded$status)
 # # ok                 -- classificado normalmente
-# # resposta_invalida  -- o servidor respondeu, mas nao em JSON valido
+# # resposta_invalida  -- o servidor respondeu, mas não em JSON valido
 # # estouro_contexto   -- documento excedeu a janela de contexto
-# # timeout            -- servidor nao respondeu a tempo
+# # timeout            -- servidor não respondeu a tempo
 # # erro_servidor      -- outro erro de rede/servidor
 
 ## -----------------------------------------------------------------------------
@@ -73,6 +73,6 @@ knitr::opts_chunk$set(
 # info <- attr(coded, "run_info")
 # info$model
 # info$params_efetivos$temperature   # a temperatura que o PROVEDOR confirmou
-# info$temperatura_pedida            # a temperatura que voce PEDIU
+# info$temperatura_pedida            # a temperatura que você PEDIU
 # info$codebook_hash
 

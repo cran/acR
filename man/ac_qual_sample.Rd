@@ -7,7 +7,7 @@
 ac_qual_sample(
   coded,
   n = 50L,
-  strategy = c("uncertainty", "stratified", "random", "disagreement", "proportional"),
+  strategy = c("random", "uncertainty", "stratified", "disagreement", "proportional"),
   strata = NULL,
   min_per_stratum = 1L,
   min_stratum_size = 10L,
@@ -23,18 +23,20 @@ ac_qual_sample(
 
 \item{strategy}{Estratégia de amostragem:
 \itemize{
+\item \code{"random"} (padrão): amostra aleatória simples. Representativa:
+use para estimar a confiabilidade que vai para o artigo;
 \item \code{"uncertainty"}: prioriza documentos com menor \code{confidence_score}
-(maior incerteza da LLM);
-\item \code{"stratified"}: garante representação proporcional de todas as
-categorias;
-\item \code{"random"}: amostra aleatória simples;
+(maior incerteza da LLM). Serve para diagnóstico de erros, \strong{não}
+para estimar confiabilidade (amostra enviesada para casos difíceis);
+\item \code{"stratified"}: divide \code{n} igualmente entre as categorias atribuídas
+pela LLM (sobre-representa categorias raras; não é representativa);
 \item \code{"disagreement"}: prioriza documentos onde rodadas de self-consistency
 divergiram (requer \code{confidence_score < 1});
 \item \code{"proportional"}: amostragem estratificada com alocação
 proporcional ao tamanho de cada estrato (método do maior resto),
 respeitando um mínimo por estrato. Diferente de \code{"stratified"}
 (que divide \code{n} igualmente entre categorias), preserva a
-distribuição original de \code{strata} na amostra — a escolha correta
+distribuição original de \code{strata} na amostra: a escolha correta
 quando a amostra alimenta uma estimativa populacional (ex.:
 \code{ac_qual_reliability()} ponderada), não só uma checagem
 qualitativa de cada categoria.
@@ -47,7 +49,7 @@ qualitativa de cada categoria.
 proporcional, mesmo que a alocação exata dê menos. Padrão \code{1}.}
 
 \item{min_stratum_size}{Estratos da população com menos documentos
-que isso são agrupados em \code{"Outras"} antes de alocar — evita
+que isso são agrupados em \code{"Outras"} antes de alocar: evita
 alocar uma fração ínfima da amostra a uma categoria com 2
 documentos na população inteira. Padrão \code{10}.}
 
@@ -68,11 +70,31 @@ ponderadas.
 }
 \description{
 \code{ac_qual_sample()} seleciona uma amostra de documentos classificados pela
-LLM para validação por um codificador humano, usando diferentes estratégias
-para maximizar a eficiência da validação.
+LLM para validação por um codificador humano.
+
+\strong{Duas finalidades diferentes, duas estratégias diferentes.}
+\enumerate{
+\item \emph{Estimar a confiabilidade} que vai para o artigo
+(\code{\link[=ac_qual_reliability]{ac_qual_reliability()}}): a amostra precisa ser \strong{representativa}
+do corpus. Krippendorff (2018, cap. 12) exige que os dados de
+confiabilidade sejam amostrados da mesma população que os dados
+analisados; uma amostra enviesada para casos difíceis subestima a
+concordância real, e uma enviesada para casos fáceis a superestima.
+Use \code{"random"} (padrão) ou \code{"proportional"}.
+\item \emph{Diagnosticar erros} e refinar o codebook: aí vale concentrar o
+esforço humano onde a LLM mais erra, como em amostragem por incerteza
+de \emph{active learning} (Settles, 2012). Use \code{"uncertainty"} ou
+\code{"disagreement"}, mas \strong{não} reporte a concordância calculada nessa
+amostra como confiabilidade do corpus.
+}
+
+Sobre o tamanho: Neuendorf (2017) sugere uma subamostra de
+confiabilidade de 10\% a 20\% do corpus, raramente menos de 50 unidades;
+Krippendorff (2018, sec. 12.3) oferece um cálculo formal a partir do
+alfa mínimo aceitável e da frequência da categoria mais rara.
 }
 \examples{
-# Simular saida de ac_qual_code() com 20 documentos ja classificados
+# Simular saida de ac_qual_code() com 20 documentos já classificados
 set.seed(1)
 coded <- tibble::tibble(
   doc_id           = paste0("doc_", 1:20),
@@ -80,11 +102,23 @@ coded <- tibble::tibble(
   confidence_score = runif(20, 0.5, 1.0)
 )
 
-# Priorizar casos mais incertos para revisao humana
+# Amostra representativa (padrao): para estimar a confiabilidade
+ac_qual_sample(coded, n = 5)
+
+# Priorizar casos mais incertos: diagnostico de erros, nao confiabilidade
 ac_qual_sample(coded, n = 5, strategy = "uncertainty")
 
 # Garantir cobertura proporcional das duas categorias
 ac_qual_sample(coded, n = 6, strategy = "stratified")
 
+}
+\references{
+Krippendorff, K. (2018). \emph{Content Analysis: An Introduction to Its
+Methodology} (4th ed.). SAGE.
+
+Neuendorf, K. A. (2017). \emph{The Content Analysis Guidebook} (2nd ed.).
+SAGE.
+
+Settles, B. (2012). \emph{Active Learning}. Morgan & Claypool.
 }
 \concept{qualitative}

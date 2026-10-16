@@ -11,7 +11,7 @@
 #' assistidas por LLM: **o revisor ou leitor não consegue reproduzir a
 #' rodada** sem saber exatamente qual modelo, qual codebook, quais
 #' parâmetros e qual amostra foram usados. Sem esse relatório, o leitor
-#' tem que confiar no autor — algo que a tradição de análise de conteúdo
+#' tem que confiar no autor: algo que a tradição de análise de conteúdo
 #' (Krippendorff, 2018) sempre rejeitou. O documento gerado é autocontido
 #' e pode ser anexado como material suplementar do artigo, publicado como
 #' apêndice ou depositado num repositório de dados junto com o codebook em
@@ -21,14 +21,14 @@
 #' em português ou inglês (para submissões internacionais).
 #'
 #' @param coded Tibble com resultado de [ac_qual_code()].
-#' @param codebook Objeto `ac_codebook` usado na classificacao.
+#' @param codebook Objeto `ac_codebook` usado na classificação.
 #' @param reliability Opcional. Saida de [ac_qual_reliability()]; se
 #'   fornecido, adiciona secao de confiabilidade inter-codificador.
 #' @param chat Opcional. Objeto `Chat` do `ellmer` (ou string de modelo);
-#'   se fornecido, extrai provedor/modelo/parametros para o relatorio.
-#' @param title Titulo do relatorio. Padrao: gerado a partir do nome do codebook.
+#'   se fornecido, extrai provedor/modelo/parametros para o relatório.
+#' @param title Título do relatório. Padrao: gerado a partir do nome do codebook.
 #' @param author Autor(es) do estudo (opcional).
-#' @param method Descricao livre do metodo de coleta do corpus (opcional).
+#' @param method Descrição livre do metodo de coleta do corpus (opcional).
 #' @param format Formato de saida: `"md"` (padrao) ou `"html"`.
 #' @param path Caminho do arquivo destino. Se `NULL`, usa `tempfile()`.
 #' @param lang Idioma: `"pt"` (padrao) ou `"en"`.
@@ -53,7 +53,7 @@
 #'   reasoning        = rep("...", 5)
 #' )
 #'
-#' # Gerar relatorio em markdown temporario
+#' # Gerar relatório em markdown temporário
 #' arquivo <- tempfile(fileext = ".md")
 #' ac_qual_report(coded, cb, path = arquivo, author = "Fulano de Tal")
 #' # readLines(arquivo, n = 20)
@@ -202,7 +202,7 @@ ac_qual_report <- function(coded,
       llm_reasoning    = "Raciocinio estruturado",
       llm_reasoning_len = "Extensao do raciocinio",
       llm_note         = paste(
-        "Self-consistency (Wang et al., 2022) reduz variabilidade estocastica reamostrando",
+        "Self-consistency (Wang et al., 2023) reduz variabilidade estocastica reamostrando",
         "cada documento k vezes e tomando a moda das classificacoes. `confidence_score` reporta",
         "a proporcao de rodadas que concordaram (1.00 = todas concordaram)."
       ),
@@ -215,9 +215,10 @@ ac_qual_report <- function(coded,
       rel_section      = "6. Confiabilidade inter-codificador",
       rel_none         = "Nao foi executada validacao humana nesta rodada.",
       rel_note         = paste(
-        "Interpretacao de kappa/alpha segundo Landis & Koch (1977) e Gwet (2014).",
-        "Para publicacao, valores acima de 0.67 (Krippendorff) ou 0.61 (Landis-Koch)",
-        "sao geralmente considerados aceitaveis."
+        "Alfa de Krippendorff interpretado segundo Krippendorff (2018): >= 0.800 confiavel;",
+        "0.667-0.800 apenas para conclusoes provisorias; < 0.667 insuficiente.",
+        "AC1 de Gwet lido com as faixas de Landis & Koch (1977), como em Gwet (2014);",
+        "essas faixas sao convencoes descritivas, nao criterios de publicacao."
       ),
       refs_section     = "7. Referencias metodologicas",
       how_to_cite      = "8. Como citar esta analise",
@@ -261,7 +262,7 @@ ac_qual_report <- function(coded,
       llm_reasoning    = "Structured reasoning",
       llm_reasoning_len = "Reasoning length",
       llm_note         = paste(
-        "Self-consistency (Wang et al., 2022) reduces stochastic variability by resampling",
+        "Self-consistency (Wang et al., 2023) reduces stochastic variability by resampling",
         "each document k times and taking the modal classification. `confidence_score` reports",
         "the proportion of rounds that agreed (1.00 = full agreement)."
       ),
@@ -274,9 +275,10 @@ ac_qual_report <- function(coded,
       rel_section      = "6. Inter-coder reliability",
       rel_none         = "No human validation was performed for this round.",
       rel_note         = paste(
-        "Kappa/alpha interpretation follows Landis & Koch (1977) and Gwet (2014).",
-        "For publication, values above 0.67 (Krippendorff) or 0.61 (Landis-Koch) are generally",
-        "considered acceptable."
+        "Krippendorff's alpha is interpreted following Krippendorff (2018): >= 0.800 reliable;",
+        "0.667-0.800 only for tentative conclusions; < 0.667 insufficient.",
+        "Gwet's AC1 is read with the Landis & Koch (1977) bands, as in Gwet (2014);",
+        "these bands are descriptive conventions, not publication criteria."
       ),
       refs_section     = "7. Methodological references",
       how_to_cite      = "8. How to cite this analysis",
@@ -559,7 +561,7 @@ ac_qual_report <- function(coded,
 #'
 #' @description
 #' `ac_qual_report_full()` gera **um único** documento (Markdown ou HTML)
-#' consolidando resultados de N variáveis de codificação qualitativa —
+#' consolidando resultados de N variáveis de codificação qualitativa:
 #' cada uma com seu próprio codebook, rodada de [ac_qual_code()] e,
 #' opcionalmente, métricas de [ac_qual_reliability()] ou [ac_qual_irr()].
 #'
@@ -570,7 +572,7 @@ ac_qual_report <- function(coded,
 #' relatórios manualmente, ou escrever um consolidador ad hoc por projeto.
 #'
 #' Aceita variáveis `multilabel = TRUE` e `multilabel = FALSE` no mesmo
-#' relatório — cada seção herda a apresentação apropriada para o tipo.
+#' relatório: cada seção herda a apresentação apropriada para o tipo.
 #'
 #' @param variables Lista **nomeada** onde cada elemento é uma lista com:
 #'   * `coded`: tibble com resultado de [ac_qual_code()] (obrigatório).
@@ -580,7 +582,7 @@ ac_qual_report <- function(coded,
 #'   Os nomes da lista viram os títulos das seções do relatório.
 #' @param chat Opcional. Objeto `Chat` do `ellmer` ou string de modelo
 #'   `"provider/model"`. Aplica-se a todas as variáveis (assumindo que
-#'   todas foram classificadas com o mesmo modelo — se não, deixe `NULL`).
+#'   todas foram classificadas com o mesmo modelo: se não, deixe `NULL`).
 #' @param title Título do relatório consolidado. Padrão: `"Relatório
 #'   consolidado de análise de conteúdo"`.
 #' @param author Autor(es) do estudo.
@@ -592,7 +594,7 @@ ac_qual_report <- function(coded,
 #' @return Invisível: caminho do arquivo gerado.
 #'
 #' @examples
-#' # Duas variaveis de conteudo, cada uma com seu codebook
+#' # Duas variáveis de conteúdo, cada uma com seu codebook
 #' cb_tom <- ac_qual_codebook(
 #'   name = "tom",
 #'   instructions = "Classifique o tom.",

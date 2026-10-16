@@ -27,7 +27,7 @@
 #'   gerando um banco estruturado com trecho original, tradução, autor, ano,
 #'   revista e link. O pesquisador revisa e aprova interativamente.
 #'
-#' Todo codebook mantém um `history` das modificações — quem alterou, quando
+#' Todo codebook mantém um `history` das modificações: quem alterou, quando
 #' e o quê. Essencial para auditoria metodológica quando o instrumento evolui
 #' entre a versão piloto e a versão final publicada.
 #'
@@ -75,7 +75,7 @@
 #'
 #' @examples
 #' # Codebook manual com duas categorias, cada uma com exemplos positivos
-#' # (o que E) e negativos (o que NAO e, para desambiguar categorias vizinhas)
+#' # (o que E) e negativos (o que NÃO e, para desambiguar categorias vizinhas)
 #' cb <- ac_qual_codebook(
 #'   name         = "tom_discurso",
 #'   instructions = "Classifique o tom geral do discurso.",
@@ -87,7 +87,7 @@
 #'       weight       = 1  # peso relativo no prompt; use >1 para priorizar
 #'     ),
 #'     negativo = list(
-#'       definition   = "Discurso com tom critico ou confrontacional.",
+#'       definition   = "Discurso com tom crítico ou confrontacional.",
 #'       examples_pos = c("Esta proposta vai arruinar o pais."),
 #'       examples_neg = c("Apresento esta emenda para melhorar o texto."),
 #'       weight       = 1
@@ -215,7 +215,7 @@ ac_qual_codebook <- function(name,
 #'   instructions = "Classifique o tom.",
 #'   categories   = list(
 #'     positivo = list(definition = "Tom propositivo."),
-#'     negativo = list(definition = "Tom critico.")
+#'     negativo = list(definition = "Tom crítico.")
 #'   )
 #' )
 #'
@@ -223,7 +223,7 @@ ac_qual_codebook <- function(name,
 #' cb <- ac_qual_codebook_add(cb,
 #'   neutro = list(
 #'     definition   = "Tom neutro, sem posicionamento claro.",
-#'     examples_pos = c("O projeto foi apresentado na sessao de hoje.")
+#'     examples_pos = c("O projeto foi apresentado na sessão de hoje.")
 #'   )
 #' )
 #' names(cb$categories)  # "positivo" "negativo" "neutro"
@@ -279,12 +279,12 @@ ac_qual_codebook_add <- function(codebook, ...) {
 #'   instructions = "Classifique o tom.",
 #'   categories   = list(
 #'     positivo = list(definition = "Tom propositivo."),
-#'     negativo = list(definition = "Tom critico."),
+#'     negativo = list(definition = "Tom crítico."),
 #'     neutro   = list(definition = "Tom neutro.")
 #'   )
 #' )
 #'
-#' # Remover a categoria "neutro" (aceita tambem um vetor de nomes)
+#' # Remover a categoria "neutro" (aceita também um vetor de nomes)
 #' cb <- ac_qual_codebook_remove(cb, "neutro")
 #' names(cb$categories)  # "positivo" "negativo"
 #'
@@ -380,7 +380,7 @@ summary.ac_codebook <- function(object, ...) {
 #' Salvar codebook em arquivo YAML
 #'
 #' Serializa um objeto `ac_codebook` em disco no formato YAML, preservando
-#' instrucoes, categorias, exemplos, referencias e historico de modificacoes.
+#' instrucoes, categorias, exemplos, referências e histórico de modificacoes.
 #' YAML foi escolhido por ser legivel por humanos e versionavel em Git.
 #'
 #' @param codebook Objeto `ac_codebook`.
@@ -396,11 +396,11 @@ summary.ac_codebook <- function(object, ...) {
 #'   instructions = "Classifique o tom do discurso.",
 #'   categories   = list(
 #'     positivo = list(definition = "Tom propositivo e colaborativo."),
-#'     negativo = list(definition = "Tom critico e confrontacional.")
+#'     negativo = list(definition = "Tom crítico e confrontacional.")
 #'   )
 #' )
 #'
-#' # Salvar em arquivo temporario (usar caminho real fora de exemplos)
+#' # Salvar em arquivo temporário (usar caminho real fora de exemplos)
 #' arquivo <- tempfile(fileext = ".yaml")
 #' ac_qual_save_codebook(cb, path = arquivo)
 #'
@@ -451,8 +451,8 @@ ac_qual_save_codebook <- function(codebook, path = NULL, ...) {
 #' Carregar codebook de arquivo YAML
 #'
 #' Le um arquivo YAML gerado por [ac_qual_save_codebook()] e reconstroi
-#' o objeto `ac_codebook` na sessao atual. Uso tipico: retomar uma analise
-#' iniciada em outra sessao ou por outro pesquisador.
+#' o objeto `ac_codebook` na sessão atual. Uso típico: retomar uma análise
+#' iniciada em outra sessão ou por outro pesquisador.
 #'
 #' @param path Caminho do arquivo `.yaml`.
 #' @param ... Ignorado.
@@ -460,7 +460,7 @@ ac_qual_save_codebook <- function(codebook, path = NULL, ...) {
 #' @return Objeto `ac_codebook`.
 #'
 #' @examples
-#' # Preparar um codebook e salvar em arquivo temporario
+#' # Preparar um codebook e salvar em arquivo temporário
 #' cb <- ac_qual_codebook(
 #'   name         = "polaridade",
 #'   instructions = "Classifique a polaridade do texto.",
@@ -472,7 +472,7 @@ ac_qual_save_codebook <- function(codebook, path = NULL, ...) {
 #' arquivo <- tempfile(fileext = ".yaml")
 #' ac_qual_save_codebook(cb, path = arquivo)
 #'
-#' # Recarregar em outra sessao
+#' # Recarregar em outra sessão
 #' cb_novo <- ac_qual_load_codebook(arquivo)
 #' names(cb_novo$categories)  # "favor" "contra"
 #'
@@ -986,7 +986,7 @@ ac_qual_load_codebook <- function(path, ...) {
 #'   instructions = "Identifique tom populista no discurso.",
 #'   categories   = list(
 #'     populista     = list(definition = "Apela ao povo contra a elite."),
-#'     nao_populista = list(definition = "Discurso tecnico ou institucional.")
+#'     nao_populista = list(definition = "Discurso técnico ou institucional.")
 #'   )
 #' )
 #'
@@ -998,7 +998,7 @@ ac_qual_load_codebook <- function(path, ...) {
 #'   lang     = "pt"
 #' )
 #'
-#' # 3. Inspecionar as referencias anexadas a cada categoria
+#' # 3. Inspecionar as referências anexadas a cada categoria
 #' cb_ancorado$categories$populista$references
 #' }
 #'
@@ -1043,11 +1043,11 @@ ac_qual_codebook_hybrid <- function(codebook, chat=NULL, model='anthropic/claude
 #'   )
 #' )
 #' cb <- ac_qual_codebook_add(cb,
-#'   neutro = list(definition = "Sem valencia clara.")
+#'   neutro = list(definition = "Sem valência clara.")
 #' )
 #' cb <- ac_qual_codebook_remove(cb, "neutro")
 #'
-#' # Ver historico completo de acoes registradas
+#' # Ver histórico completo de acoes registradas
 #' ac_qual_codebook_history(cb)
 #'
 #' @concept qualitative
@@ -1081,7 +1081,7 @@ ac_qual_codebook_history <- function(codebook, n=Inf) {
 #'   name         = "tom",
 #'   instructions = "Classifique o tom do texto.",
 #'   categories   = list(
-#'     formal   = list(definition = "Linguagem tecnica e impessoal."),
+#'     formal   = list(definition = "Linguagem técnica e impessoal."),
 #'     informal = list(definition = "Linguagem coloquial ou emotiva.")
 #'   )
 #' )
@@ -1147,7 +1147,7 @@ as_prompt.ac_codebook <- function(x, reasoning=TRUE, reasoning_length=c('short',
 #'   )
 #' )
 #'
-#' # Fundir em um unico codebook com 4 categorias
+#' # Fundir em um único codebook com 4 categorias
 #' cb <- ac_qual_codebook_merge(cb_tom, cb_estilo, name = "tom_estilo")
 #' names(cb$categories)  # "positivo" "negativo" "pathos" "logos"
 #'
@@ -1209,10 +1209,10 @@ ac_qual_codebook_merge <- function(cb1, cb2, name=NULL, on_conflict=c('error','k
 #' @export
 ac_qual_codebook_translate <- function(codebook, to=c('en','pt'), chat=NULL, model='anthropic/claude-sonnet-4-5', translate_examples=TRUE) {
   if (!inherits(codebook,'ac_codebook')) cli::cli_abort('{.arg codebook} deve ser ac_codebook.')
-  if (!requireNamespace('ellmer',quietly=TRUE)) cli::cli_abort('ellmer necessario.')
-  if (!requireNamespace('jsonlite',quietly=TRUE)) cli::cli_abort('jsonlite necessario.')
   to <- match.arg(to)
   if (codebook$lang==to) { cli::cli_inform('J\u00e1 em {.val {to}}.'); return(codebook) }
+  if (!requireNamespace('ellmer',quietly=TRUE)) cli::cli_abort('ellmer necessario.')
+  if (!requireNamespace('jsonlite',quietly=TRUE)) cli::cli_abort('jsonlite necessario.')
   effective_model <- if (!is.null(chat)) chat else model
   lang_names <- c(pt='portugu\u00eas brasileiro',en='English')
   payload <- list(instructions=codebook$instructions,categories=purrr::imap(codebook$categories,function(cat,nm){entry<-list(name=nm,definition=cat$definition);if(isTRUE(translate_examples)){entry$examples_pos<-cat$examples_pos;entry$examples_neg<-cat$examples_neg};entry}))

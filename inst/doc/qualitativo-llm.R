@@ -42,7 +42,7 @@ cb <- ac_qual_codebook(
   ),
   multilabel = FALSE,   # cada doc recebe UMA categoria; se TRUE, a coluna
                         # `categoria` na saida vira uma string pipe-separada
-                        # ("tecnica|politica") quando mais de uma se aplicar.
+                        # ("técnica|politica") quando mais de uma se aplicar.
   lang       = "pt"
 )
 
@@ -173,8 +173,8 @@ print(cb)
 # cb_recarregado <- ac_qual_load_codebook("codebook_discurso.yaml")
 
 ## ----validacao----------------------------------------------------------------
-# # Amostrar 30 documentos priorizando os incertos
-# amostra <- ac_qual_sample(resultado, n = 30, strategy = "uncertainty")
+# # Amostra aleatória de 50 documentos (representativa do corpus)
+# amostra <- ac_qual_sample(resultado, n = 50, strategy = "random")
 # ac_qual_export_for_review(amostra, path = "revisao.xlsx", corpus = corpus)
 # 
 # # Após preenchimento manual, calcular IRR
@@ -183,7 +183,7 @@ print(cb)
 # print(irr)
 
 ## ----report-minimal-----------------------------------------------------------
-# # Apos ter o resultado da classificacao
+# # Após ter o resultado da classificação
 # ac_qual_report(
 #   coded     = resultado,
 #   codebook  = cb_completo,

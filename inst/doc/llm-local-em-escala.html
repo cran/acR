@@ -364,7 +364,7 @@ configuração da execução</a></li>
 <h2>Visão geral</h2>
 <p>Esta vignette cobre o fluxo de <code>ac_qual_code()</code> quando o
 modelo roda <strong>localmente</strong> (LM Studio, llama.cpp, vLLM,
-Ollama em modo OpenAI) em vez de um provedor em nuvem — o cenário mais
+Ollama em modo OpenAI) em vez de um provedor em nuvem: o cenário mais
 comum quando os documentos não podem sair do ambiente do pesquisador
 (dados sensíveis, acordos de confidencialidade institucional) ou quando
 o volume de documentos tornaria o custo por token de um provedor pago
@@ -408,7 +408,7 @@ documento vai consumir:</p>
 <span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a><span class="co"># Quantos documentos provavelmente excedem uma janela de 8k tokens?</span></span>
 <span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a><span class="fu">sum</span>(tamanhos <span class="sc">&gt;</span> <span class="dv">8000</span>)</span></code></pre></div>
 <p><code>ac_estimate_tokens()</code> é uma heurística (caracteres por
-token) — não faz nenhuma chamada de rede. Para uma estimativa calibrada
+token): não faz nenhuma chamada de rede. Para uma estimativa calibrada
 contra o modelo e tokenizador real, rode
 <code>ac_calibrate_tokens()</code> numa amostra pequena antes da rodada
 completa:</p>
@@ -420,7 +420,7 @@ completa:</p>
 <span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a>razao <span class="ot">&lt;-</span> <span class="fu">ac_calibrate_tokens</span>(chat_factory, <span class="fu">sample</span>(corpus<span class="sc">$</span>text, <span class="dv">10</span>))</span>
 <span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a>tamanhos_calibrados <span class="ot">&lt;-</span> <span class="fu">ac_estimate_tokens</span>(corpus<span class="sc">$</span>text, <span class="at">chars_per_token =</span> razao)</span></code></pre></div>
 <p>Documentos que excedem a janela de contexto do servidor não devem ser
-enviados como estão — considere dividir manualmente em partes menores
+enviados como estão: considere dividir manualmente em partes menores
 antes de montar o <code>ac_corpus()</code>, ou reduzir
 <code>reasoning_length</code> para liberar espaço para a resposta.</p>
 </div>
@@ -442,12 +442,12 @@ a rodada for interrompida, rodar o mesmo comando de novo pula os
 documentos já concluídos e continua de onde parou.
 <code>live = &quot;progress&quot;</code> mostra uma barra enxuta (documento atual
 + status) em vez de ecoar categoria e raciocínio a cada uma das
-<code>k_consistency</code> rodadas — importante para não poluir o
-console numa rodada de milhares de documentos.</p>
+<code>k_consistency</code> rodadas: importante para não poluir o console
+numa rodada de milhares de documentos.</p>
 <p>Se os parâmetros da rodada mudarem (codebook revisado, modelo
 diferente, <code>k_consistency</code> diferente), o
 <code>checkpoint_dir</code> é invalidado e recomeça do zero
-automaticamente — com aviso — para nunca misturar classificações de
+automaticamente (com aviso), para nunca misturar classificações de
 codebooks diferentes sem que o pesquisador perceba.</p>
 </div>
 <div id="lidando-com-falhas-técnicas" class="section level2">
@@ -459,25 +459,24 @@ muitas horas rodando. A coluna <code>status</code> do resultado
 diferencia os tipos de falha:</p>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a><span class="fu">table</span>(coded<span class="sc">$</span>status)</span>
 <span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a><span class="co"># ok                 -- classificado normalmente</span></span>
-<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># resposta_invalida  -- o servidor respondeu, mas nao em JSON valido</span></span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co"># resposta_invalida  -- o servidor respondeu, mas não em JSON valido</span></span>
 <span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co"># estouro_contexto   -- documento excedeu a janela de contexto</span></span>
-<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co"># timeout            -- servidor nao respondeu a tempo</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co"># timeout            -- servidor não respondeu a tempo</span></span>
 <span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co"># erro_servidor      -- outro erro de rede/servidor</span></span></code></pre></div>
 <p><code>max_retries</code> tenta de novo (com espera exponencial) para
 <code>timeout</code> e <code>erro_servidor</code>, mas não para
-<code>estouro_contexto</code> — repetir a mesma chamada com o mesmo
-texto não vai resolver um documento que simplesmente não cabe na janela
-do modelo. Se mais da metade dos últimos documentos falhar, a rodada é
-interrompida automaticamente — sinal de que o servidor está instável e
+<code>estouro_contexto</code>: repetir a mesma chamada com o mesmo texto
+não vai resolver um documento que simplesmente não cabe na janela do
+modelo. Se mais da metade dos últimos documentos falhar, a rodada é
+interrompida automaticamente: sinal de que o servidor está instável e
 insistir só desperdiçaria tempo.</p>
 </div>
 <div id="validação-humana-por-categoria-multilabel" class="section level2">
 <h2>5. Validação humana por categoria (multilabel)</h2>
 <p>Quando o codebook é <code>multilabel = TRUE</code>, a métrica
 agregada de [ac_qual_reliability()] mistura decisões binárias
-independentes num único número — uma concordância “boa” pode esconder
-uma categoria específica indo mal. Use
-<code>by_variable = TRUE</code>:</p>
+independentes num único número: uma concordância “boa” pode esconder uma
+categoria específica indo mal. Use <code>by_variable = TRUE</code>:</p>
 <div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>rel <span class="ot">&lt;-</span> <span class="fu">ac_qual_reliability</span>(</span>
 <span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">llm    =</span> coded,</span>
 <span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">human  =</span> humano_df,</span>
@@ -487,9 +486,9 @@ uma categoria específica indo mal. Use
 <span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a></span>
 <span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="fu">attr</span>(rel, <span class="st">&quot;by_variable&quot;</span>)</span></code></pre></div>
 <p><code>exclude_status</code> remove da comparação documentos cuja
-rodada principal falhou — uma categoria vinda de uma resposta inválida
-ou um timeout não é um dado confiável sobre concordância, e misturá-la
-nas métricas por variável distorceria o diagnóstico.</p>
+rodada principal falhou: uma categoria vinda de uma resposta inválida ou
+um timeout não é um dado confiável sobre concordância, e misturá-la nas
+métricas por variável distorceria o diagnóstico.</p>
 <p>Para montar a amostra de validação humana de forma representativa da
 população (não só de cada categoria igualmente, como
 <code>strategy = &quot;stratified&quot;</code> faz), use
@@ -509,20 +508,20 @@ rodada:</p>
 <div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>info <span class="ot">&lt;-</span> <span class="fu">attr</span>(coded, <span class="st">&quot;run_info&quot;</span>)</span>
 <span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>info<span class="sc">$</span>model</span>
 <span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>info<span class="sc">$</span>params_efetivos<span class="sc">$</span>temperature   <span class="co"># a temperatura que o PROVEDOR confirmou</span></span>
-<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>info<span class="sc">$</span>temperatura_pedida            <span class="co"># a temperatura que voce PEDIU</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>info<span class="sc">$</span>temperatura_pedida            <span class="co"># a temperatura que você PEDIU</span></span>
 <span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a>info<span class="sc">$</span>codebook_hash</span></code></pre></div>
 <p>Compare <code>params_efetivos$temperature</code> com
 <code>temperatura_pedida</code> antes de reportar
 <code>confidence_score</code> num artigo: se um <code>Chat</code>
 pré-configurado não confirmar a temperatura pedida,
 <code>ac_qual_code()</code> já emite um aviso explícito no momento da
-rodada — mas <code>run_info</code> permite auditar isso depois,
-inclusive em rodadas de terceiros.</p>
+rodada, mas <code>run_info</code> permite auditar isso depois, inclusive
+em rodadas de terceiros.</p>
 </div>
 <div id="referências" class="section level2">
 <h2>Referências</h2>
 <p>Wang, X. et al. (2023). Self-Consistency Improves Chain of Thought
-Reasoning in Language Models. <em>EMNLP</em>.</p>
+Reasoning in Language Models. <em>ICLR</em>.</p>
 <p>Gilardi, F.; Alizadeh, M.; Kubli, M. (2023). ChatGPT Outperforms
 Crowd Workers for Text-Annotation Tasks. <em>PNAS</em>, 120(30).</p>
 <p>Gwet, K. L. (2014). <em>Handbook of Inter-Rater Reliability</em> (4th

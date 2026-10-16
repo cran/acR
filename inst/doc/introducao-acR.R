@@ -11,18 +11,35 @@ knitr::opts_chunk$set(
 ## ----setup--------------------------------------------------------------------
 library(acR)
 
+## ----lexico, include=FALSE----------------------------------------------------
+# ac_sentiment() baixa o OpLexicon (GitHub) na primeira execução e guarda
+# em cache. Sem acesso a ele, os trechos que dependem do léxico não rodam,
+# em vez de interromper a vignette com erro.
+tem_lexico <- tryCatch({
+  suppressMessages(ac_sentiment(ac_corpus(data.frame(text = "bom"))))
+  TRUE
+}, error = function(e) FALSE)
+
+## ----aviso-lexico, echo=FALSE, results="asis", eval=!tem_lexico---------------
+# cat(
+#   "> **Aviso:** o léxico OpLexicon não pôde ser baixado ao gerar esta",
+#   "> página (sem acesso à internet), então os trechos que dependem dele",
+#   "> não foram executados. Rode a vignette com internet para ver as saídas.",
+#   sep = "\n"
+# )
+
 ## ----corpus-------------------------------------------------------------------
 df <- data.frame(
   id      = paste0("d", 1:8),
   texto   = c(
-    "Sou favoravel a reforma tributaria: simplifica o sistema e reduz distorcoes.",
+    "Sou favoravel a reforma tributária: simplifica o sistema e reduz distorcoes.",
     "Voto contra: essa reforma vai destruir o setor produtivo brasileiro.",
-    "Apoio a proposta com forte adesao, ha ganhos claros de eficiencia arrecadatoria.",
+    "Apoio a proposta com forte adesao, ha ganhos claros de eficiência arrecadatória.",
     "Rejeito o texto: transfere renda das familias para grandes corporacoes.",
     "Defendo a reforma que corrige as distorcoes historicas do nosso sistema.",
-    "Somos contrarios: o projeto beneficia apenas os mais ricos do pais.",
-    "Voto sim, precisamos modernizar urgentemente a estrutura tributaria.",
-    "Voto nao, os pequenos empresarios serao os grandes prejudicados."
+    "Somos contrários: o projeto beneficia apenas os mais ricos do pais.",
+    "Voto sim, precisamos modernizar urgentemente a estrutura tributária.",
+    "Voto não, os pequenos empresários serao os grandes prejudicados."
   ),
   partido = c("PT","PL","PT","PL","PT","PL","PT","PL"),
   posicao = c("favor","contra","favor","contra","favor","contra","favor","contra"),
@@ -52,11 +69,11 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
   ac_plot_keyness(key, n = 6)
 }
 
-## ----sentimento---------------------------------------------------------------
+## ----sentimento, eval=tem_lexico----------------------------------------------
 sent <- ac_sentiment(corpus)
 sent
 
-## ----plot-sentimento----------------------------------------------------------
+## ----plot-sentimento, eval=tem_lexico-----------------------------------------
 if (requireNamespace("ggplot2", quietly = TRUE)) {
   ac_plot_sentiment(sent)
 }
@@ -67,7 +84,7 @@ ac_qual_recommend_model(task = "coding", budget = "medium", lang = "pt", n = 3)
 ## ----coding, eval = FALSE-----------------------------------------------------
 # codebook <- ac_qual_codebook(
 #   name         = "posicionamento",
-#   instructions = "Classifique o posicionamento sobre a reforma tributaria.",
+#   instructions = "Classifique o posicionamento sobre a reforma tributária.",
 #   categories   = list(
 #     favor  = list(
 #       definition   = "Manifestação favorável à reforma.",
@@ -87,8 +104,9 @@ ac_qual_recommend_model(task = "coding", budget = "medium", lang = "pt", n = 3)
 # )
 
 ## ----validacao-code, eval = FALSE---------------------------------------------
-# # Amostra estratificada priorizando casos incertos
-# amostra <- ac_qual_sample(codificado, n = 50, strategy = "uncertainty")
+# # Amostra aleatória (representativa): é ela que estima a confiabilidade
+# # do corpus. Amostrar só os casos incertos subestimaria a concordância.
+# amostra <- ac_qual_sample(codificado, n = 50, strategy = "random")
 # 
 # # Exporta planilha para revisão humana
 # ac_qual_export_for_review(amostra, path = "revisao.xlsx", corpus = corpus)
